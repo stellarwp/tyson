@@ -10,7 +10,13 @@
     "build": "tsc",
     "start": "tsc --watch",
     "format": "prettier --write 'src/**/*.{ts,tsx}'",
-    "format:check": "prettier --check 'src/**/*.{ts,tsx}'"
+    "format:check": "prettier --check 'src/**/*.{ts,tsx}'",
+    "test": "jest",
+    "pre-commit": [
+      "npm run format",
+      "npm run build",
+      "npm run test"
+    ]
   },
   "keywords": [
     "stellarwp",
@@ -34,12 +40,12 @@
   },
   "homepage": "https://github.com/stellarwp/tyson",
   "dependencies": {
-    "@types/webpack": "^5.28.5",
-    "@wordpress/scripts": "^30.7.0"
+    "@types/webpack": "^5.28.5"
   },
   "devDependencies": {
     "jest": "^29.6.4",
     "prettier": "^3.4.2",
+    "typescript": "^5.7.3",
     "yargs": "^17.7.2"
   }
 }
