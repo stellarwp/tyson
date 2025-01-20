@@ -6,7 +6,7 @@ function fileMatcher({ fileName, fileRelativePath, }) {
     return !(fileName.endsWith(".min.js") || fileRelativePath.includes("__tests__"));
 }
 function entryPointName({ fileRelativePath }) {
-    return "js/" + fileRelativePath.replace(/\.js$/, "");
+    return "js" + fileRelativePath.replace(/\.js$/, "");
 }
 function expose({ entryPointName, fileAbsolutePath, }) {
     // From 'js/customizer-views-v2-live-preview' to  'tec.customizerViewsV2LivePreview'.

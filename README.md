@@ -12,6 +12,7 @@ Instead, it provides a utility to create and maintain customized configuration f
 use `@wordpress/scripts` to build and package it.
 
 Tyson comes with a number of **configuration presets** used by StellarWP teams.
+de -
 
 Each configuration preset is composed of **configuration schemas** and **tweaks**.
 

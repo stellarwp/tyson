@@ -13,7 +13,7 @@ function fileMatcher({
 }
 
 function entryPointName({ fileRelativePath }: FileCallbackArguments): string {
-	return "js/" + fileRelativePath.replace(/\.js$/, "");
+	return "js" + fileRelativePath.replace(/\.js$/, "");
 }
 
 function expose({
