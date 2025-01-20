@@ -8,7 +8,7 @@ exports.ruleUsesLoader = ruleUsesLoader;
  * (e.g. `/home/User/some-loader/dist/index.js`). For this reason the comparison is not a strict ones,
  * but a `loader.includes(candidate)` one.
  *
- * @param {Object} rule      A rule in the `module.rules` WebPack schema configuration format to check.
+ * @param {WebPackRule} rule      A rule in the `module.rules` WebPack schema configuration format to check.
  * @param {string} loader    The name of a loader to check.
  *
  * @returns {boolean} Whether the specified rule uses the specified loader or not.

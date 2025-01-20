@@ -13,7 +13,9 @@ const ruleUsesLoader_1 = require("./ruleUsesLoader");
  * namespaced) so here we prepend a rule to handle SVG files in the `src/modules` directory by
  * disabling the `prefixIds` plugin.
  *
- * @param {Object} config The WebPack configuration to update.
+ * @param {Object} config The WebPack configuration, it will be updated in place.
+ *
+ * @return {void} The WebPack configuration will be updated in place.
  */
 function doNotPrefixSVGIdsClasses(config) {
     /*

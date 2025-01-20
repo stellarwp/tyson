@@ -17,23 +17,23 @@ const discoveredPackageRoots = [];
  * @returns {boolean} Whether the file is a package index file or not.
  */
 export function isPackageRootIndex(fileRelativePath: string): boolean {
-	const dirFrags = dirname(fileRelativePath)
-		.split("/")
-		.filter((frag) => frag !== "")
-		.reverse();
-	let curDir = dirFrags.pop();
-	let prevDir = null;
-	while (dirFrags.length !== 0 && prevDir !== curDir) {
-		if (discoveredPackageRoots.includes(curDir)) {
-			return false;
-		}
-		prevDir = curDir;
-		curDir += "/" + dirFrags.pop();
-	}
+  const dirFrags = dirname(fileRelativePath)
+    .split("/")
+    .filter((frag) => frag !== "")
+    .reverse();
+  let curDir = dirFrags.pop();
+  let prevDir = null;
+  while (dirFrags.length !== 0 && prevDir !== curDir) {
+    if (discoveredPackageRoots.includes(curDir)) {
+      return false;
+    }
+    prevDir = curDir;
+    curDir += "/" + dirFrags.pop();
+  }
 
-	return true;
+  return true;
 }
 
 export function addToDiscoveredPackageRoots(packageRoot: string): void {
-	discoveredPackageRoots.push(packageRoot);
+  discoveredPackageRoots.push(packageRoot);
 }

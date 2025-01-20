@@ -1,5 +1,5 @@
 export type FileCallbackArguments = {
-	fileName: string;
-	fileRelativePath: string;
-	fileAbsolutePath: string;
+  fileName: string;
+  fileRelativePath: string;
+  fileAbsolutePath: string;
 };

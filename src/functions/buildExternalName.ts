@@ -12,27 +12,27 @@
  * @return {string} The external name of the entry point.
  */
 export function buildExternalName(
-	namespace: string,
-	relativePath: string,
-	dropFrags: string[] = [],
+  namespace: string,
+  relativePath: string,
+  dropFrags: string[] = [],
 ): string {
-	if (!namespace) {
-		throw new Error("Namespace cannot be empty");
-	}
+  if (!namespace) {
+    throw new Error("Namespace cannot be empty");
+  }
 
-	if (!relativePath) {
-		throw new Error("Name cannot be empty");
-	}
+  if (!relativePath) {
+    throw new Error("Name cannot be empty");
+  }
 
-	return (
-		namespace +
-		"." +
-		relativePath
-			.split("/")
-			.filter((frag) => !dropFrags.includes(frag))
-			.map((frag) =>
-				frag.replace(/[\._-](\w)/g, (match) => match[1].toUpperCase()),
-			)
-			.join(".")
-	);
+  return (
+    namespace +
+    "." +
+    relativePath
+      .split("/")
+      .filter((frag) => !dropFrags.includes(frag))
+      .map((frag) =>
+        frag.replace(/[\._-](\w)/g, (match) => match[1].toUpperCase()),
+      )
+      .join(".")
+  );
 }

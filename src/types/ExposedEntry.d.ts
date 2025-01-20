@@ -1,7 +1,7 @@
 export type ExposedEntry = {
-	import: string;
-	library: {
-		name: string;
-		type: "window";
-	};
+  import: string;
+  library: {
+    name: string;
+    type: "window";
+  };
 };

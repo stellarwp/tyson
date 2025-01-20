@@ -7,11 +7,11 @@ import { prependRuleToRuleInConfig } from "./prependRuleToRuleInConfig";
 import { ruleUsesLoader } from "./ruleUsesLoader";
 
 export {
-	buildExternalName,
-	compileCustomEntryPoints,
-	doNotPrefixSVGIdsClasses,
-	exposeEntry,
-	isPackageRootIndex,
-	prependRuleToRuleInConfig,
-	ruleUsesLoader,
+  buildExternalName,
+  compileCustomEntryPoints,
+  doNotPrefixSVGIdsClasses,
+  exposeEntry,
+  isPackageRootIndex,
+  prependRuleToRuleInConfig,
+  ruleUsesLoader,
 };

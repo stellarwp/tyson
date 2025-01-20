@@ -17,8 +17,7 @@ const exposeEntry_1 = require("./exposeEntry");
  * @param {WebPackConfiguration} config The WebPack configuration to use for this entry point; updated in place if
  *     needed.
  *
- * @returns {void} Entries will be updated in place; depending on the schema, the WebPack configuration as well might
- * modified in place.
+ * @returns {void} Entries and or the WebPack configuration will be updated in place depending on the schema.
  */
 function compileCustomEntryPoint(schema, relativePath, entries, config) {
     const fileExtensions = schema.fileExtensions;

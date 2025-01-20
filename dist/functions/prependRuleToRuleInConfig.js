@@ -4,9 +4,10 @@ exports.prependRuleToRuleInConfig = prependRuleToRuleInConfig;
 /**
  * Prepends a rule to another rule in the WebPack configuration.
  *
- * @param {Object} config  WebPack configuration.
- * @param {Object} rule    Rule to prepend.
- * @param {function(rule: string): boolean} ruleMatcher A function that will be used to find the rule to prepend the rule to.
+ * @param {WebPackConfiguration} config  WebPack configuration.
+ * @param {WebPackRule} rule    Rule to prepend.
+ * @param {function(rule: string): boolean} ruleMatcher A function that will be used to find the rule to prepend the
+ *     rule to.
  *
  * @return {void} The configuration is modified in place.
  */

@@ -46,52 +46,55 @@ const path_1 = __importDefault(require("path"));
 const yargs_2 = require("yargs");
 const readline = __importStar(require("node:readline/promises"));
 const node_process_1 = require("node:process");
-const packageJsonPath = path_1.default.join(__dirname, '../../package.json');
-const { name, version, description } = JSON.parse(fs_1.default.readFileSync(packageJsonPath, 'utf-8'));
+const packageJsonPath = path_1.default.join(__dirname, "../../package.json");
+const { name, version, description } = JSON.parse(fs_1.default.readFileSync(packageJsonPath, "utf-8"));
 function getTemplateFiles(directory) {
     const files = fs_1.default.readdirSync(directory);
-    return files.filter(file => path_1.default.extname(file).toLowerCase() === '.template').map(file => path_1.default.join(directory, file));
+    return files
+        .filter((file) => path_1.default.extname(file).toLowerCase() === ".template")
+        .map((file) => path_1.default.join(directory, file));
 }
 function getAvailablePresets(presetsDirectory = null) {
-    presetsDirectory = presetsDirectory || path_1.default.join(__dirname, '../../', 'presets');
+    presetsDirectory =
+        presetsDirectory || path_1.default.join(__dirname, "../../", "presets");
     const files = fs_1.default.readdirSync(presetsDirectory);
     if (!files.length) {
         throw new Error(`No preset directories found in ${presetsDirectory}`);
     }
     return files
-        .filter(file => fs_1.default.statSync(path_1.default.join(presetsDirectory, file)).isDirectory())
+        .filter((file) => fs_1.default.statSync(path_1.default.join(presetsDirectory, file)).isDirectory())
         .reduce((acc, file) => {
         const fullPath = path_1.default.join(presetsDirectory, file);
         acc[file] = getTemplateFiles(fullPath);
         return acc;
     }, {});
 }
-async function askUser(question, defaultValue = '') {
+async function askUser(question, defaultValue = "") {
     const rl = readline.createInterface({ input: node_process_1.stdin, output: node_process_1.stdout });
-    const answer = await rl.question(question.trim() + ' ');
+    const answer = await rl.question(question.trim() + " ");
     return answer.trim() || defaultValue;
 }
 async function initWebpackConfig(preset, force) {
     const availablePresets = getAvailablePresets();
     const availablePresetNames = Object.keys(availablePresets);
     if (!preset) {
-        preset = 'example';
+        preset = "example";
     }
     else if (!availablePresetNames.includes(preset)) {
-        console.error(`Preset ${preset} is not available. Available presets: ${availablePresetNames.join(', ')}`);
+        console.error(`Preset ${preset} is not available. Available presets: ${availablePresetNames.join(", ")}`);
         process.exit(1);
     }
     const currentWorkingDir = process.cwd();
     const templateVars = {
-        namespace: await askUser('What is the namespace you would like to use?', path_1.default.basename(currentWorkingDir))
+        namespace: await askUser("What is the namespace you would like to use?", path_1.default.basename(currentWorkingDir)),
     };
     console.log(`Scaffolding files for preset ${preset} ...`);
     for (const templateFile of availablePresets[preset]) {
-        let compiled = fs_1.default.readFileSync(templateFile)?.toString('utf-8');
+        let compiled = fs_1.default.readFileSync(templateFile)?.toString("utf-8");
         for (const [key, value] of Object.entries(templateVars)) {
             compiled = compiled.replaceAll(`%${key}%`, value);
         }
-        const destinationFile = path_1.default.join(process.cwd(), path_1.default.basename(templateFile.replace(/\.template$/, '')));
+        const destinationFile = path_1.default.join(process.cwd(), path_1.default.basename(templateFile.replace(/\.template$/, "")));
         // If the file to write already exists, do not overwrite the existing file, but write the content STDOUT.
         if (fs_1.default.existsSync(destinationFile)) {
             console.warn(`Destination file already exists: ${destinationFile}, --force|-f not used: the file will be NOT overwritten.`);
@@ -104,21 +107,27 @@ async function initWebpackConfig(preset, force) {
     console.log(`Custom configuration created with preset: ${preset}`);
 }
 console.log(`${name} v${version}\n${description}\n`);
-const argv = (0, yargs_1.default)((0, helpers_1.hideBin)(process.argv)).command('init [--preset|-p <preset>] [--force]', 'Initialize a custom webpack.config.js file.', yargs => {
-    return yargs.option('preset', {
-        alias: 'p',
-        describe: 'Configuration preset to use',
-        type: 'string',
+const argv = (0, yargs_1.default)((0, helpers_1.hideBin)(process.argv))
+    .command("init [--preset|-p <preset>] [--force]", "Initialize a custom webpack.config.js file.", (yargs) => {
+    return yargs
+        .option("preset", {
+        alias: "p",
+        describe: "Configuration preset to use",
+        type: "string",
         choices: Object.keys(getAvailablePresets()),
-    }).option('force', {
-        alias: 'f',
-        describe: 'Force overwrite of existing webpack.config.js file.',
-        type: 'boolean',
+    })
+        .option("force", {
+        alias: "f",
+        describe: "Force overwrite of existing webpack.config.js file.",
+        type: "boolean",
         default: false,
     });
-}, argv => initWebpackConfig(argv.preset, argv.force).then(() => process.exit(0))).command('preset-list', 'List available configuration presets.', yargs => {
-}, () => console.log(`Available presets: ${Object.keys(getAvailablePresets()).join(', ')}`)).option('help', {
-    alias: 'h',
-    describe: 'Show help',
-    type: 'boolean',
-}).wrap((0, yargs_2.terminalWidth)()).demandCommand(1, 'You need to specify a command. Use --help for more information.').argv;
+}, (argv) => initWebpackConfig(argv.preset, argv.force).then(() => process.exit(0)))
+    .command("preset-list", "List available configuration presets.", (yargs) => { }, () => console.log(`Available presets: ${Object.keys(getAvailablePresets()).join(", ")}`))
+    .option("help", {
+    alias: "h",
+    describe: "Show help",
+    type: "boolean",
+})
+    .wrap((0, yargs_2.terminalWidth)())
+    .demandCommand(1, "You need to specify a command. Use --help for more information.").argv;
