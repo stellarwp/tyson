@@ -134,5 +134,3 @@ using to test `tyson`.
 [1]: https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#provide-your-own-webpack-config
 
 [2]: https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#build
-
-[3]: 
