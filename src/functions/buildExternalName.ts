@@ -29,6 +29,7 @@ export function buildExternalName(
     "." +
     relativePath
       .split("/")
+      .filter((f) => f)
       .filter((frag) => !dropFrags.includes(frag))
       .map((frag) =>
         frag.replace(/[\._-](\w)/g, (match) => match[1].toUpperCase()),

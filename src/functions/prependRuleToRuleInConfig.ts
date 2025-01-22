@@ -17,9 +17,10 @@ export function prependRuleToRuleInConfig(
   ruleMatcher: (element: any, index: number, array: any[]) => boolean,
 ): void {
   // Run direct access on the configuration: if the schema does not match this should crash.
-  const ruleIndex = config.module.rules.findIndex(ruleMatcher);
+  const rules = Array.isArray(config?.module?.rules) ? config.module.rules : [];
+  const ruleIndex = rules.findIndex(ruleMatcher);
 
-  if (ruleIndex === undefined) {
+  if (ruleIndex === -1) {
     throw new Error("No matching rule found");
   }
 

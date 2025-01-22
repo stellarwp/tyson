@@ -1,13 +1,14 @@
+type UseEntry =
+  | string
+  | {
+      loader?: string;
+      options?: object;
+    };
+
 export type WebPackRule = {
   test?: RegExp;
   issuer?: RegExp;
-  use?:
-    | string
-    | string[]
-    | {
-        loader?: string;
-        options?: object;
-      }[];
+  use?: UseEntry | UseEntry[];
   type:
     | "javascript/auto"
     | "javascript/dynamic"

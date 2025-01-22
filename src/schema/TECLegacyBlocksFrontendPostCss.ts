@@ -8,7 +8,7 @@ import { FileCallbackArguments } from "../types/FileCallbackArguments";
  * @param {FileCallbackArguments} args - The arguments containing the file name to match.
  * @returns {boolean} - True if the file name is `frontend.pcss`, otherwise false.
  */
-function fileMatcher({ fileName }: FileCallbackArguments): boolean {
+export function fileMatcher({ fileName }: FileCallbackArguments): boolean {
   return fileName === "frontend.pcss";
 }
 
@@ -19,7 +19,9 @@ function fileMatcher({ fileName }: FileCallbackArguments): boolean {
  * @param {FileCallbackArguments} args - The arguments containing the relative path of the file.
  * @returns {string} - The constructed entry point name.
  */
-function entryPointName({ fileRelativePath }: FileCallbackArguments): string {
+export function entryPointName({
+  fileRelativePath,
+}: FileCallbackArguments): string {
   return "app/" + basename(dirname(fileRelativePath)) + "/frontend";
 }
 

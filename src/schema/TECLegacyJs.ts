@@ -9,7 +9,7 @@ import { buildExternalName } from "../functions/buildExternalName";
  * @param {FileCallbackArguments} args - The arguments containing the file name and relative path.
  * @returns {boolean} - Returns true if the file should be included, false otherwise.
  */
-function fileMatcher({
+export function fileMatcher({
   fileName,
   fileRelativePath,
 }: FileCallbackArguments): boolean {
@@ -24,7 +24,9 @@ function fileMatcher({
  * @param {FileCallbackArguments} args - The arguments containing the relative file path.
  * @returns {string} - The generated entry point name.
  */
-function entryPointName({ fileRelativePath }: FileCallbackArguments): string {
+export function entryPointName({
+  fileRelativePath,
+}: FileCallbackArguments): string {
   return "js" + fileRelativePath.replace(/\.js$/, "");
 }
 
@@ -34,7 +36,7 @@ function entryPointName({ fileRelativePath }: FileCallbackArguments): string {
  * @param {ExposeCallbackArguments} args - The arguments containing the entry point name and absolute file path.
  * @returns {string | false} - Returns the external name if the file should be exposed, false otherwise.
  */
-function expose({
+export function expose({
   entryPointName,
   fileAbsolutePath,
 }: ExposeCallbackArguments): string | false {

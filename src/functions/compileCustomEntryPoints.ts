@@ -52,7 +52,10 @@ export function compileCustomEntryPoint(
 
     const fileRelativePath = fileAbsolutePath.replace(locationAbsolutePath, "");
     const fileName = basename(fileAbsolutePath);
-    if (!fileMatcher({ fileName, fileRelativePath, fileAbsolutePath })) {
+    if (
+      typeof fileMatcher === "function" &&
+      !fileMatcher({ fileName, fileRelativePath, fileAbsolutePath })
+    ) {
       return;
     }
 
@@ -62,24 +65,28 @@ export function compileCustomEntryPoint(
       fileAbsolutePath,
     });
 
-    if ((schema?.expose || false) === false || !file.match(/(t|j)sx?$/)) {
+    const schemaExpose = schema?.expose || false;
+
+    if (schemaExpose === false || !file.match(/(t|j)sx?$/)) {
       // `schema.expose` is not set or set to `false`: do not expose.
       entries[entryPointName] = fileAbsolutePath;
     } else {
-      // If `schema.expose` is a string, then it's used as a namespace.
-      const exposeName =
-        typeof schema.expose === "string"
-          ? buildExternalName(schema.expose, entryPointName)
-          : // Else build the name using `schema.expose` as a callback.
-            schema.expose({
-              entryPointName,
-              fileName,
-              fileRelativePath,
-              fileAbsolutePath,
-            });
+      let exposeName = null;
+
+      if (typeof schemaExpose === "string") {
+        exposeName = buildExternalName(schemaExpose, entryPointName);
+      } else {
+        // Expose is a function: run it to either get the expose name (string) or `false` to not expose.
+        exposeName = schemaExpose({
+          entryPointName,
+          fileName,
+          fileRelativePath,
+          fileAbsolutePath,
+        });
+      }
 
       if (!exposeName) {
-        // The callback did not return a value, do not expose.
+        // The callback returned an empty value, do not expose.
         entries[entryPointName] = fileAbsolutePath;
       } else {
         // The callback did return a value, use it as expose name.

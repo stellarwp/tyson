@@ -5,7 +5,7 @@ import { dirname } from "path";
  *
  * @type {string[]}
  */
-const discoveredPackageRoots = [];
+let discoveredPackageRoots = [];
 
 /**
  * Returns whether a file is a package index file or not.
@@ -34,6 +34,27 @@ export function isPackageRootIndex(fileRelativePath: string): boolean {
   return true;
 }
 
+/**
+ * Reset the so far discovered package roots.
+ */
+export function resetDiscoveredPackageRoots(): void {
+  discoveredPackageRoots = [];
+}
+
+/**
+ * Add a discovered package root to the set of so far discovered package roots.
+ *
+ * @param {string} packageRoot The package root to add.
+ */
 export function addToDiscoveredPackageRoots(packageRoot: string): void {
   discoveredPackageRoots.push(packageRoot);
+}
+
+/**
+ * Returns the package roots discovered so far.
+ *
+ * @return {string[]} The package roots discovered so far.
+ */
+export function getDiscoveredPackageRoots(): string[] {
+  return discoveredPackageRoots;
 }

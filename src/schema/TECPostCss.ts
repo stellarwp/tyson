@@ -7,7 +7,7 @@ import { FileCallbackArguments } from "../types/FileCallbackArguments";
  * @param {FileCallbackArguments} args - The arguments containing the file name.
  * @returns {boolean} - True if the file name does not start with "_", otherwise false.
  */
-function fileMatcher({ fileName }: FileCallbackArguments): boolean {
+export function fileMatcher({ fileName }: FileCallbackArguments): boolean {
   return !fileName.startsWith("_");
 }
 
@@ -16,7 +16,9 @@ function fileMatcher({ fileName }: FileCallbackArguments): boolean {
  * @param {FileCallbackArguments} args - The arguments containing the relative file path.
  * @returns {string} - The generated entry point name with ".pcss" replaced by an empty string and prefixed with "css/".
  */
-function entryPointName({ fileRelativePath }: FileCallbackArguments): string {
+export function entryPointName({
+  fileRelativePath,
+}: FileCallbackArguments): string {
   return "css/" + fileRelativePath.replace(".pcss", "");
 }
 
@@ -30,7 +32,7 @@ function entryPointName({ fileRelativePath }: FileCallbackArguments): string {
  *
  * @param {WebPackConfiguration} config - The WebPack configuration object to be modified.
  */
-function modifyConfig(config: WebPackConfiguration): void {
+export function modifyConfig(config: WebPackConfiguration): void {
   config.module.rules.push({
     test: /src\/modules\/.*?\.pcss$/,
     use: [

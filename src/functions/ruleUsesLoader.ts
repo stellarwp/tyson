@@ -40,7 +40,7 @@ export function ruleUsesLoader(rule: WebPackRule, loader: string): boolean {
     }
 
     if (typeof use === "object") {
-      if (use?.loader?.includes(loader)) {
+      if ((use?.loader || "").includes(loader)) {
         return true;
       }
       continue;

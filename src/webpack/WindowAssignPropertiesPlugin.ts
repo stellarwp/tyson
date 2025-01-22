@@ -1,18 +1,5 @@
-import { validate } from "schema-utils";
 import { RawSource, Source } from "webpack-sources";
 import { WindowAssignPropertiesPluginOptions } from "../types/WindowAssignPropertiesPluginOptions";
-
-const schema = {
-  type: "object",
-  properties: {
-    webPackLineStart: {
-      type: "string",
-      description:
-        "The line prefix that will be used to start the line in the compiled file.",
-    },
-  },
-  additionalProperties: false,
-};
 
 export class WindowAssignPropertiesPlugin {
   static defaultOptions: WindowAssignPropertiesPluginOptions = {
@@ -23,14 +10,18 @@ export class WindowAssignPropertiesPlugin {
   private options: WindowAssignPropertiesPluginOptions;
 
   constructor(options: WindowAssignPropertiesPluginOptions = {}) {
-    validate(options, schema, {
-      name: WindowAssignPropertiesPlugin.name,
-      baseDataPath: "options",
-    });
     this.options = {
       ...WindowAssignPropertiesPlugin.defaultOptions,
       ...options,
     };
+
+    if (typeof this.options.webPackLineStart !== "string") {
+      throw new Error("WebPack Line Start must be a string");
+    }
+  }
+
+  public getOptions(): WindowAssignPropertiesPluginOptions {
+    return this.options;
   }
 
   public apply(compiler) {
