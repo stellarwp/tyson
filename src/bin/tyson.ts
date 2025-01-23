@@ -108,6 +108,7 @@ async function initWebpackConfig(
 console.log(`${name} v${version}\n${description}\n`);
 
 const argv = yargs(hideBin(process.argv))
+  .scriptName("tyson")
   .command(
     "init [--preset|-p <preset>] [--force]",
     "Initialize a custom webpack.config.js file.",
@@ -143,7 +144,6 @@ const argv = yargs(hideBin(process.argv))
     describe: "Show help",
     type: "boolean",
   })
-  .wrap(terminalWidth())
   .demandCommand(
     1,
     "You need to specify a command. Use --help for more information.",
