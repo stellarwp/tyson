@@ -76,8 +76,6 @@ If you want to force overwriting the existing file, you can use the `--force` op
 node_modules/.bin/tyson init --force
 ```
 
-WIP
-
 ## Development
 
 If you want to work on the project, start by cloning it on your local machine:
