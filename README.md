@@ -1,6 +1,4 @@
-# Tyson (WIP!)
-
-**This is a work in progress! It should not be used in production.**
+# Tyson
 
 Create and manage custom configurations to build projects with `@wordpress/scripts.`
 
@@ -12,7 +10,6 @@ Instead, it provides a utility to create and maintain customized configuration f
 use `@wordpress/scripts` to build and package it.
 
 Tyson comes with a number of **configuration presets** used by StellarWP teams.
-de -
 
 Each configuration preset is composed of **configuration schemas** and **tweaks**.
 
@@ -134,3 +131,5 @@ using to test `tyson`.
 [1]: https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#provide-your-own-webpack-config
 
 [2]: https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#build
+
+[3]: https://github.com/nvm-sh/nvm
