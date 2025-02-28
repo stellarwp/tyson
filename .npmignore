@@ -1,0 +1,7 @@
+.gitignore
+.npmignore
+tests
+src
+jest.config.js
+tsconfig.json
+.nvmrc
