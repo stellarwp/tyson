@@ -63,22 +63,22 @@ If there are provisionally remove the conflicting packages from the plugin `pack
 Less installed packages means less current and compatibility issue now and in the future.
 
 To detect packages that can be removed from the plugin `package.json` use the `listDependencies` script from the
-[stellarwp/tyson-tools][1] repository.
+`tools` directory of the `stellarwp/tyson` package.
 
 If you did not already, clone the repository to your machine:
 
 ```bash
 cd ~/repos
-git clone https://github.com/stellarwp/tyson-tools
-cd tyson-tools
+git clone https://github.com/stellarwp/tyson
+cd tyson
 ```
 
-Assuming you've cloned the `stellarwp/tyson-tools` repository to the `~/repos/tyson-tools` directory and that you're
+Assuming you've cloned the `stellarwp/tyson` repository to the `~/repos/stellarwp/tyson` directory and that you're
 working on the Event Tickets plugin in the `~/repos/tec/event-tickets` directory:
 
 ```bash
-node ~/repos/tyson-tools/listDependencies.js all \
-  | xargs -I{} node ~/repos/tyson-tools/checkIncluded.js @wordpress/scripts {} \
+node ~/repos/stellarwp/tyson/tools/listDependencies.js all \
+  | xargs -I{} node ~/repos/stellarwp/tyson/tools//checkIncluded.js @wordpress/scripts {} \
   | grep -v NOT
 ```
 
