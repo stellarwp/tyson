@@ -126,6 +126,12 @@ npm link @stellarwp/tyson
 Once you've done this, you will be able to run `node_modules/.bin/tyson` from the root directory of the project you're 
 using to test `tyson`.
 
+## Migration
+
+Specific migration guides are available for each suite:
+
+* [TEC](docs/tec-migration.md)
+
 [1]: https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#provide-your-own-webpack-config
 
 [2]: https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#build
