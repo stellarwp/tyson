@@ -50,7 +50,6 @@ export function entryPointName({
  */
 export function expose({
   entryPointName,
-  fileAbsolutePath,
 }: ExposeCallbackArguments): string | false {
   // From 'resources/packages/customizer-views-v2-live-preview' to  'tec.customizerViewsV2LivePreview'.
   // From 'resources/packages/tec-update-6.0.0-notice' to 'tec.tecUpdate600Notice'.
