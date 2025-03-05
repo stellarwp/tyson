@@ -60,9 +60,7 @@ describe("modifyConfig", () => {
     const config: WebPackConfiguration = { module: { rules: [] } };
     modifyConfig(config);
     expect(config.module.rules).toHaveLength(1);
-    expect(config.module.rules[0].test.toString()).toBe(
-      /src\/modules\/.*?\.pcss$/.toString(),
-    );
+    expect(config.module.rules[0].test.toString()).toBe(/\.pcss$/.toString());
   });
 
   it("does not override existing rules", () => {
@@ -76,9 +74,7 @@ describe("modifyConfig", () => {
     modifyConfig(config);
     expect(config.module.rules).toHaveLength(2);
     expect(config.module.rules[0].test.toString()).toBe(/\.js$/.toString());
-    expect(config.module.rules[1].test.toString()).toBe(
-      /src\/modules\/.*?\.pcss$/.toString(),
-    );
+    expect(config.module.rules[1].test.toString()).toBe(/\.pcss$/.toString());
   });
 });
 

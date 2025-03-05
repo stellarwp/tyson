@@ -36,7 +36,7 @@ function entryPointName({ fileRelativePath, }) {
  * @param {ExposeCallbackArguments} args - The arguments containing the entry point name and absolute file path.
  * @returns {string | false} - Returns the external name if the file should be exposed, false otherwise.
  */
-function expose({ entryPointName, fileAbsolutePath, }) {
+function expose({ entryPointName, }) {
     // From 'resources/packages/customizer-views-v2-live-preview' to  'tec.customizerViewsV2LivePreview'.
     // From 'resources/packages/tec-update-6.0.0-notice' to 'tec.tecUpdate600Notice'.
     return (0, functions_1.buildExternalName)("tec", entryPointName, ["js"]);

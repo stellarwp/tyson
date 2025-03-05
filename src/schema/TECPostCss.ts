@@ -34,7 +34,7 @@ export function entryPointName({
  */
 export function modifyConfig(config: WebPackConfiguration): void {
   config.module.rules.push({
-    test: /src\/modules\/.*?\.pcss$/,
+    test: /\.pcss$/,
     use: [
       {
         loader: "postcss-loader",

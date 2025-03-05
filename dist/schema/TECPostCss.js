@@ -32,7 +32,7 @@ function entryPointName({ fileRelativePath, }) {
  */
 function modifyConfig(config) {
     config.module.rules.push({
-        test: /src\/modules\/.*?\.pcss$/,
+        test: /\.pcss$/,
         use: [
             {
                 loader: "postcss-loader",
