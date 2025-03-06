@@ -91,16 +91,29 @@ $visitor   = new class extends NodeVisitorAbstract {
 			// Assets loaded from vendor or node_modules don't need to be in ./build, but we still need to make sure they're not missing.
 			$assetFile = '/' . $match[0];
 			// These files might come only in minified version.
-			$minifiedAssetFile = preg_replace( '/\.(js|css)$/', '.min$0', $assetFile );
+			$minifiedAssetFile           = preg_replace( '/\.(js|css)$/', '.min$0', $assetFile );
 			$assetFileRealpathCandidates = [ $assetFile, $minifiedAssetFile ];
-			$survivingCandidates = array_filter(
+			$survivingCandidates         = array_filter(
 				$assetFileRealpathCandidates,
 				static fn( string $candidate ): bool => is_file( getcwd() . $candidate )
 			);
-			$assetFile = count( $survivingCandidates ) ? reset( $survivingCandidates ) : $assetFile;
+			$assetFile                   = count( $survivingCandidates ) ? reset( $survivingCandidates ) : $assetFile;
 		} else if ( str_starts_with( $match[0], 'app' ) ) {
-			// The /app bundle will be packaged in the `/build/app` directory.
-			$assetFile = '/build/' . $match[0];
+			/*
+			 * The `app` name is tricky: it might be a package built in the `/build` directory or an asset just named
+			 * something like `app-shop.js`.
+			 */
+			$extensionFragments  = explode( '.', $match[2] );
+			$extension           = end( $extensionFragments );
+			$candidates          = [
+				'/build/' . $match[0], // The app built in `/build`.
+				"/build/$extension/$match[0]" // An asset called `app-something.js`.
+			];
+			$survivingCandidates = array_filter(
+				$candidates,
+				static fn( string $candidate ): bool => is_file( getcwd() . $candidate )
+			);
+			$assetFile           = count( $survivingCandidates ) ? reset( $survivingCandidates ) : '/build/' . $match[0];
 		} else {
 			$assetFile = "/build/{$extension}/{$match[0]}";
 		}
