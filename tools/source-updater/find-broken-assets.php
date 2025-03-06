@@ -42,7 +42,7 @@ $visitor   = new class extends NodeVisitorAbstract {
 	/**
 	 * @var array<string,true>
 	 */
-	private array $registeredAssets  = [];
+	private array $registeredAssets = [];
 
 	public function setCurrentFile( SplFileInfo $file ) {
 		$this->currentFile = $file;
@@ -90,6 +90,14 @@ $visitor   = new class extends NodeVisitorAbstract {
 		) {
 			// Assets loaded from vendor or node_modules don't need to be in ./build, but we still need to make sure they're not missing.
 			$assetFile = '/' . $match[0];
+			// These files might come only in minified version.
+			$minifiedAssetFile = preg_replace( '/\.(js|css)$/', '.min$0', $assetFile );
+			$assetFileRealpathCandidates = [ $assetFile, $minifiedAssetFile ];
+			$survivingCandidates = array_filter(
+				$assetFileRealpathCandidates,
+				static fn( string $candidate ): bool => is_file( getcwd() . $candidate )
+			);
+			$assetFile = count( $survivingCandidates ) ? reset( $survivingCandidates ) : $assetFile;
 		} else if ( str_starts_with( $match[0], 'app' ) ) {
 			// The /app bundle will be packaged in the `/build/app` directory.
 			$assetFile = '/build/' . $match[0];
@@ -110,9 +118,9 @@ $visitor   = new class extends NodeVisitorAbstract {
 
 		if ( $extension === 'js' ) {
 			// If the file is a .js file, check if a `style-<asset>.css` file exists: if it exists, collect it for later checking.
-			$basename = basename( $match[0]);
-			$cssFile = str_replace( $basename, 'style-' . substr($basename,0,-3) . '.css', $assetFile );
-			if(is_file(getcwd(). $cssFile)){
+			$basename = basename( $match[0] );
+			$cssFile  = str_replace( $basename, 'style-' . substr( $basename, 0, - 3 ) . '.css', $assetFile );
+			if ( is_file( getcwd() . $cssFile ) ) {
 				// There is a style file: make sure it's registered along with the JS asset.
 				$this->unregisteredCssAsset[ $cssFile ] = [
 					'jsAssetFile' => $assetFile,
@@ -124,7 +132,7 @@ $visitor   = new class extends NodeVisitorAbstract {
 			// The file is a CSS file: remove it from the unregistered CSS assets list.
 			unset( $this->unregisteredCssAsset[ $assetFile ] );
 		}
-		$this->registeredAssets[$assetFile] = true;
+		$this->registeredAssets[ $assetFile ] = true;
 	}
 
 	/**
@@ -178,14 +186,14 @@ $parser = ( new ParserFactory )->createForNewestSupportedVersion();
 /** @var SplFileInfo $file */
 foreach ( $files as $file ) {
 	$code = file_get_contents( $file->getPathname() );
-	$ast    = $parser->parse( $code );
+	$ast  = $parser->parse( $code );
 	$visitor->setCurrentFile( $file );
 	$traverser->traverse( $ast );
 }
 
 $registeredAssets = $visitor->getRegisteredAssets();
 foreach ( $visitor->getUnregisteredCssAssets() as $cssFile => $cssFileData ) {
-	if(isset($registeredAssets[$cssFile])){
+	if ( isset( $registeredAssets[ $cssFile ] ) ) {
 		continue;
 	}
 	printf(
