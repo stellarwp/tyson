@@ -12,6 +12,9 @@ import {
   isPackageRootIndex,
   prependRuleToRuleInConfig,
   ruleUsesLoader,
+  modifyRulesInConfig,
+  usesLoader,
+  preprocessPostcssWithPlugins,
 } from "./functions";
 import { WindowAssignPropertiesPlugin } from "./webpack";
 
@@ -28,5 +31,8 @@ export {
   isPackageRootIndex,
   prependRuleToRuleInConfig,
   ruleUsesLoader,
+  modifyRulesInConfig,
+  usesLoader,
+  preprocessPostcssWithPlugins,
   WindowAssignPropertiesPlugin,
 };

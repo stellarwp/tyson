@@ -1,4 +1,5 @@
 import { WebPackRule } from "../types/WebPackRule";
+import { usesLoader } from "./usesLoader";
 
 /**
  * Returns whether an object following the `module.rules` WebPack schema configuration format uses a loader or not.
@@ -18,34 +19,5 @@ export function ruleUsesLoader(rule: WebPackRule, loader: string): boolean {
     return false;
   }
 
-  // The rule.use property is a string.
-  if (typeof rule.use === "string" && rule.use.includes(loader)) {
-    return true;
-  }
-
-  if (!Array.isArray(rule.use)) {
-    // If it's not an array, we cannot continue searching for our loader, so we can return false here.
-    return false;
-  }
-
-  for (let i = 0; i < rule.use.length; i++) {
-    const use = rule.use[i];
-
-    if (typeof use === "string") {
-      if (use.includes(loader)) {
-        return true;
-      }
-
-      continue;
-    }
-
-    if (typeof use === "object") {
-      if ((use?.loader || "").includes(loader)) {
-        return true;
-      }
-      continue;
-    }
-  }
-
-  return false;
+  return usesLoader(rule.use, loader);
 }

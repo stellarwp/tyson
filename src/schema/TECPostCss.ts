@@ -1,6 +1,7 @@
 import { ConfigurationSchema } from "../types/ConfigurationSchema";
 import { WebPackConfiguration } from "../types/WebPackConfiguration";
 import { FileCallbackArguments } from "../types/FileCallbackArguments";
+import { preprocessPostcssWithPlugins } from "../functions";
 
 /**
  * Determines if a file should be included based on its name.
