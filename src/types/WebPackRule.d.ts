@@ -1,9 +1,17 @@
-type UseEntry =
-  | string
-  | {
-      loader?: string;
-      options?: object;
+type UseEntryObject = {
+  loader: string;
+  options?: object;
+};
+
+type UseEntry = string | UseEntryObject;
+
+type PostcssUseEntry = UseEntryObject & {
+  options?: {
+    postcssOptions?: {
+      plugins: string[];
     };
+  };
+};
 
 export type WebPackRule = {
   test?: RegExp;

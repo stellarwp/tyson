@@ -1,6 +1,7 @@
 import { ConfigurationSchema } from "../types/ConfigurationSchema";
 import { WebPackConfiguration } from "../types/WebPackConfiguration";
 import { FileCallbackArguments } from "../types/FileCallbackArguments";
+import { preprocessPostcssWithPlugins } from "../functions";
 
 /**
  * Determines if a file should be included based on its name.
@@ -34,7 +35,7 @@ export function entryPointName({
  */
 export function modifyConfig(config: WebPackConfiguration): void {
   config.module.rules.push({
-    test: /src\/modules\/.*?\.pcss$/,
+    test: /\.pcss$/,
     use: [
       {
         loader: "postcss-loader",

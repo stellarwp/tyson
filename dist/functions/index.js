@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ruleUsesLoader = exports.prependRuleToRuleInConfig = exports.isPackageRootIndex = exports.exposeEntry = exports.doNotPrefixSVGIdsClasses = exports.compileCustomEntryPoints = exports.buildExternalName = void 0;
+exports.preprocessPostcssWithPlugins = exports.usesLoader = exports.modifyRulesInConfig = exports.ruleUsesLoader = exports.prependRuleToRuleInConfig = exports.isPackageRootIndex = exports.exposeEntry = exports.doNotPrefixSVGIdsClasses = exports.compileCustomEntryPoints = exports.buildExternalName = void 0;
 const buildExternalName_1 = require("./buildExternalName");
 Object.defineProperty(exports, "buildExternalName", { enumerable: true, get: function () { return buildExternalName_1.buildExternalName; } });
 const compileCustomEntryPoints_1 = require("./compileCustomEntryPoints");
@@ -15,3 +15,9 @@ const prependRuleToRuleInConfig_1 = require("./prependRuleToRuleInConfig");
 Object.defineProperty(exports, "prependRuleToRuleInConfig", { enumerable: true, get: function () { return prependRuleToRuleInConfig_1.prependRuleToRuleInConfig; } });
 const ruleUsesLoader_1 = require("./ruleUsesLoader");
 Object.defineProperty(exports, "ruleUsesLoader", { enumerable: true, get: function () { return ruleUsesLoader_1.ruleUsesLoader; } });
+const modifyRulesInConfig_1 = require("./modifyRulesInConfig");
+Object.defineProperty(exports, "modifyRulesInConfig", { enumerable: true, get: function () { return modifyRulesInConfig_1.modifyRulesInConfig; } });
+const usesLoader_1 = require("./usesLoader");
+Object.defineProperty(exports, "usesLoader", { enumerable: true, get: function () { return usesLoader_1.usesLoader; } });
+const preprocessPostcssWithPlugins_1 = require("./preprocessPostcssWithPlugins");
+Object.defineProperty(exports, "preprocessPostcssWithPlugins", { enumerable: true, get: function () { return preprocessPostcssWithPlugins_1.preprocessPostcssWithPlugins; } });

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WindowAssignPropertiesPlugin = exports.ruleUsesLoader = exports.prependRuleToRuleInConfig = exports.isPackageRootIndex = exports.exposeEntry = exports.doNotPrefixSVGIdsClasses = exports.compileCustomEntryPoints = exports.buildExternalName = exports.TECPackage = exports.TECLegacyBlocksFrontendPostCss = exports.TECPostCss = exports.TECLegacyJs = void 0;
+exports.WindowAssignPropertiesPlugin = exports.preprocessPostcssWithPlugins = exports.usesLoader = exports.modifyRulesInConfig = exports.ruleUsesLoader = exports.prependRuleToRuleInConfig = exports.isPackageRootIndex = exports.exposeEntry = exports.doNotPrefixSVGIdsClasses = exports.compileCustomEntryPoints = exports.buildExternalName = exports.TECPackage = exports.TECLegacyBlocksFrontendPostCss = exports.TECPostCss = exports.TECLegacyJs = void 0;
 const schema_1 = require("./schema");
 Object.defineProperty(exports, "TECLegacyBlocksFrontendPostCss", { enumerable: true, get: function () { return schema_1.TECLegacyBlocksFrontendPostCss; } });
 Object.defineProperty(exports, "TECLegacyJs", { enumerable: true, get: function () { return schema_1.TECLegacyJs; } });
@@ -14,5 +14,8 @@ Object.defineProperty(exports, "exposeEntry", { enumerable: true, get: function 
 Object.defineProperty(exports, "isPackageRootIndex", { enumerable: true, get: function () { return functions_1.isPackageRootIndex; } });
 Object.defineProperty(exports, "prependRuleToRuleInConfig", { enumerable: true, get: function () { return functions_1.prependRuleToRuleInConfig; } });
 Object.defineProperty(exports, "ruleUsesLoader", { enumerable: true, get: function () { return functions_1.ruleUsesLoader; } });
+Object.defineProperty(exports, "modifyRulesInConfig", { enumerable: true, get: function () { return functions_1.modifyRulesInConfig; } });
+Object.defineProperty(exports, "usesLoader", { enumerable: true, get: function () { return functions_1.usesLoader; } });
+Object.defineProperty(exports, "preprocessPostcssWithPlugins", { enumerable: true, get: function () { return functions_1.preprocessPostcssWithPlugins; } });
 const webpack_1 = require("./webpack");
 Object.defineProperty(exports, "WindowAssignPropertiesPlugin", { enumerable: true, get: function () { return webpack_1.WindowAssignPropertiesPlugin; } });

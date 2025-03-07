@@ -3,6 +3,7 @@
 use PhpParser\Node;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\NodeVisitorAbstract;
 use PhpParser\ParserFactory;
 
@@ -42,7 +43,7 @@ $visitor   = new class extends NodeVisitorAbstract {
 	/**
 	 * @var array<string,true>
 	 */
-	private array $registeredAssets  = [];
+	private array $registeredAssets = [];
 
 	public function setCurrentFile( SplFileInfo $file ) {
 		$this->currentFile = $file;
@@ -56,23 +57,44 @@ $visitor   = new class extends NodeVisitorAbstract {
 	}
 
 	public function enterNode( Node $node ) {
-		if ( ! ( $node instanceof FuncCall &&
-		         isset( $node->name )
-		         && $node->name instanceof Node\Name
-		         && in_array( $node->name->__toString(), [ 'tec_asset', 'tec_assets' ], true ) ) ) {
-			// Not a function call we're looking for.
+		if ( $node instanceof FuncCall ) {
+			if ( ! ( isset( $node->name )
+			         && $node->name instanceof Node\Name
+			         && in_array( $node->name->__toString(), [ 'tec_asset', 'tec_assets' ], true ) ) ) {
+				// Not a function call we're looking for.
+				return $node;
+			}
+
+			if ( $node->name->__toString() === 'tec_asset' ) {
+				return $this->checkAssetCall( $node );
+			}
+
+			// The called function is the `tec assets` one.
+			return $this->checkAssetsCall( $node );
+		}
+
+		if ( $node instanceof Node\Expr\StaticCall ) {
+			$className  = $node->class->name;
+			$methodName = $node->name->toString();
+
+			if (
+				$methodName === 'add'
+				&& isset( $node->args[1]->value )
+				&& $node->args[1]->value instanceof Node\Scalar\String_
+				&& in_array( $className, [
+					'TEC\Common\StellarWP\Assets\Asset',
+					'TEC\Common\Asset'
+				], true )
+			) {
+				$path = $node->args[1]->value->value;
+				$this->checkAsset( $path, $node->getLine() );
+			}
+
 			return $node;
 		}
-
-		if ( $node->name->__toString() === 'tec_asset' ) {
-			return $this->checkAssetCall( $node );
-		}
-
-		// The called function is the `tec assets` one.
-		return $this->checkAssetsCall( $node );
 	}
 
-	private function checkAsset( string $path, Node $node ): void {
+	private function checkAsset( string $path, int $line ): void {
 		if ( ! preg_match(
 			'#(?P<path>.*)(\.js|\.css)$#',
 			$path,
@@ -90,9 +112,37 @@ $visitor   = new class extends NodeVisitorAbstract {
 		) {
 			// Assets loaded from vendor or node_modules don't need to be in ./build, but we still need to make sure they're not missing.
 			$assetFile = '/' . $match[0];
+			// These files might come only in minified version.
+			$minifiedAssetFile           = preg_replace( '/\.(js|css)$/', '.min$0', $assetFile );
+			$buildAssetFile              = '/build' . $assetFile;
+			$buildMinifiedAssetFile      = '/build' . $minifiedAssetFile;
+			$assetFileRealpathCandidates = [
+				$assetFile,
+				$minifiedAssetFile,
+				$buildAssetFile,
+				$buildMinifiedAssetFile
+			];
+			$survivingCandidates         = array_filter(
+				$assetFileRealpathCandidates,
+				static fn( string $candidate ): bool => is_file( getcwd() . $candidate )
+			);
+			$assetFile                   = count( $survivingCandidates ) ? reset( $survivingCandidates ) : $assetFile;
 		} else if ( str_starts_with( $match[0], 'app' ) ) {
-			// The /app bundle will be packaged in the `/build/app` directory.
-			$assetFile = '/build/' . $match[0];
+			/*
+			 * The `app` name is tricky: it might be a package built in the `/build` directory or an asset just named
+			 * something like `app-shop.js`.
+			 */
+			$extensionFragments  = explode( '.', $match[2] );
+			$extension           = end( $extensionFragments );
+			$candidates          = [
+				'/build/' . $match[0], // The app built in `/build`.
+				"/build/$extension/$match[0]" // An asset called `app-something.js`.
+			];
+			$survivingCandidates = array_filter(
+				$candidates,
+				static fn( string $candidate ): bool => is_file( getcwd() . $candidate )
+			);
+			$assetFile           = count( $survivingCandidates ) ? reset( $survivingCandidates ) : '/build/' . $match[0];
 		} else {
 			$assetFile = "/build/{$extension}/{$match[0]}";
 		}
@@ -103,28 +153,28 @@ $visitor   = new class extends NodeVisitorAbstract {
 			printf(
 				"Error at %s:%d\n└── Asset %s doesn't exist.\n",
 				$this->currentFile->getRealPath(),
-				$node->getLine(),
+				$line,
 				'.' . $assetFile
 			);
 		}
 
 		if ( $extension === 'js' ) {
 			// If the file is a .js file, check if a `style-<asset>.css` file exists: if it exists, collect it for later checking.
-			$basename = basename( $match[0]);
-			$cssFile = str_replace( $basename, 'style-' . substr($basename,0,-3) . '.css', $assetFile );
-			if(is_file(getcwd(). $cssFile)){
+			$basename = basename( $match[0] );
+			$cssFile  = str_replace( $basename, 'style-' . substr( $basename, 0, - 3 ) . '.css', $assetFile );
+			if ( is_file( getcwd() . $cssFile ) ) {
 				// There is a style file: make sure it's registered along with the JS asset.
 				$this->unregisteredCssAsset[ $cssFile ] = [
 					'jsAssetFile' => $assetFile,
 					'file'        => $this->currentFile->getRealPath(),
-					'line'        => $node->getLine()
+					'line'        => $line
 				];
 			}
 		} else {
 			// The file is a CSS file: remove it from the unregistered CSS assets list.
 			unset( $this->unregisteredCssAsset[ $assetFile ] );
 		}
-		$this->registeredAssets[$assetFile] = true;
+		$this->registeredAssets[ $assetFile ] = true;
 	}
 
 	/**
@@ -157,7 +207,7 @@ $visitor   = new class extends NodeVisitorAbstract {
 				continue;
 			}
 
-			$this->checkAsset( $path, $node );
+			$this->checkAsset( $path, $node->getLine() );
 		}
 
 		return $node;
@@ -166,28 +216,30 @@ $visitor   = new class extends NodeVisitorAbstract {
 	private function checkAssetCall( FuncCall $node ): Node {
 		// The third argument is the asset path; if it's a .js or .css file, make sure it exists in relation to ./build.
 		if ( isset( $node->args[2] ) && $node->args[2]->value instanceof Node\Scalar\String_ ) {
-			$this->checkAsset( $node->args[2]->value->value, $node );
+			$this->checkAsset( $node->args[2]->value->value, $node->getLine() );
 		}
 
 		return $node;
 	}
 };
+$traverser->addVisitor( new NameResolver() );
 $traverser->addVisitor( $visitor );
 $parser = ( new ParserFactory )->createForNewestSupportedVersion();
 
 /** @var SplFileInfo $file */
 foreach ( $files as $file ) {
 	$code = file_get_contents( $file->getPathname() );
-	$ast    = $parser->parse( $code );
+	$ast  = $parser->parse( $code );
 	$visitor->setCurrentFile( $file );
 	$traverser->traverse( $ast );
 }
 
 $registeredAssets = $visitor->getRegisteredAssets();
 foreach ( $visitor->getUnregisteredCssAssets() as $cssFile => $cssFileData ) {
-	if(isset($registeredAssets[$cssFile])){
+	if ( isset( $registeredAssets[ $cssFile ] ) ) {
 		continue;
 	}
+
 	printf(
 		"Warning at %s:%d\n└── JS Asset %s is registered, but CSS asset %s is not.\n",
 		$cssFileData['file'],
@@ -196,4 +248,3 @@ foreach ( $visitor->getUnregisteredCssAssets() as $cssFile => $cssFileData ) {
 		getcwd() . $cssFile
 	);
 }
-

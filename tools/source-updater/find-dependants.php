@@ -39,12 +39,19 @@ if ( $argc === 2 ) {
 $command = "grep -rli '{$argv[1]}' --include='*.php' " . implode( ' ', $dir_realpaths );
 exec( $command, $files, $result_code );
 
-// If there are no PHP files containing the handle in any directory, we're done.
-if ( $result_code !== 0 ) {
-	printf( "There was an error running the grep command\n" );
-	exit( 1 );
+// The grep command will return 1 if the pattern is not found: this is fine and we're done.
+if ( $result_code === 1 ) {
+	printf( "No files found containing the handle \"%s\"\n", $argv[1] );
+	exit( 0 );
 }
 
+// The grep will return 2+ for any issue running the actual comment.
+if ( $result_code >= 2 ) {
+	printf( "An error occurred while running grep: %s\n", $files );
+	exit( $result_code );
+}
+
+// If there are no PHP files containing the handle in any directory, we're done.
 if ( empty( $files ) ) {
 	printf( "No files found containing the handle \"%s\"\n", $argv[1] );
 	exit( 0 );
@@ -93,6 +100,11 @@ $visitor   = new class( $handle ) extends NodeVisitorAbstract {
 	private function checkDependencies( Node\Expr\Array_ $dependencies ): void {
 		/** @var Node\ArrayItem $dependency */
 		foreach ( $dependencies->items as $dependency ) {
+			if(property_exists($dependency->value,'name') && $dependency->value->name === 'this'){
+				// This dependency is actually a callback function; skip it.
+				return;
+			}
+
 			/** @var string $handle */
 			$handle = $dependency->value->value;
 			if ( $handle === $this->handle ) {
