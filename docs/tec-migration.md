@@ -72,7 +72,7 @@ npm install @stellarwp/tyson
 Again, there _should_ not be conflicts when installing `@stellarwp/tyson`.  
 If there are provisionally remove the conflicting packages from the plugin `package.json` file to deal with them later.
 
-### Removing packages already installed along with @worpdress/scripts
+### Removing packages already installed along with `@wordpress/scripts`
 
 Less installed packages means less current and compatibility issue now and in the future.
 
