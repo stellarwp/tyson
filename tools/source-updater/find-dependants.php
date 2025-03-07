@@ -100,6 +100,11 @@ $visitor   = new class( $handle ) extends NodeVisitorAbstract {
 	private function checkDependencies( Node\Expr\Array_ $dependencies ): void {
 		/** @var Node\ArrayItem $dependency */
 		foreach ( $dependencies->items as $dependency ) {
+			if(property_exists($dependency->value,'name') && $dependency->value->name === 'this'){
+				// This dependency is actually a callback function; skip it.
+				return;
+			}
+
 			/** @var string $handle */
 			$handle = $dependency->value->value;
 			if ( $handle === $this->handle ) {
