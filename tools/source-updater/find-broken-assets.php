@@ -3,6 +3,7 @@
 use PhpParser\Node;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\NodeVisitorAbstract;
 use PhpParser\ParserFactory;
 
@@ -56,23 +57,44 @@ $visitor   = new class extends NodeVisitorAbstract {
 	}
 
 	public function enterNode( Node $node ) {
-		if ( ! ( $node instanceof FuncCall &&
-		         isset( $node->name )
-		         && $node->name instanceof Node\Name
-		         && in_array( $node->name->__toString(), [ 'tec_asset', 'tec_assets' ], true ) ) ) {
-			// Not a function call we're looking for.
+		if ( $node instanceof FuncCall ) {
+			if ( ! ( isset( $node->name )
+			         && $node->name instanceof Node\Name
+			         && in_array( $node->name->__toString(), [ 'tec_asset', 'tec_assets' ], true ) ) ) {
+				// Not a function call we're looking for.
+				return $node;
+			}
+
+			if ( $node->name->__toString() === 'tec_asset' ) {
+				return $this->checkAssetCall( $node );
+			}
+
+			// The called function is the `tec assets` one.
+			return $this->checkAssetsCall( $node );
+		}
+
+		if ( $node instanceof Node\Expr\StaticCall ) {
+			$className  = $node->class->name;
+			$methodName = $node->name->toString();
+
+			if (
+				$methodName === 'add'
+				&& isset( $node->args[1]->value )
+				&& $node->args[1]->value instanceof Node\Scalar\String_
+				&& in_array( $className, [
+					'TEC\Common\StellarWP\Assets\Asset',
+					'TEC\Common\Asset'
+				], true )
+			) {
+				$path = $node->args[1]->value->value;
+				$this->checkAsset( $path, $node->getLine() );
+			}
+
 			return $node;
 		}
-
-		if ( $node->name->__toString() === 'tec_asset' ) {
-			return $this->checkAssetCall( $node );
-		}
-
-		// The called function is the `tec assets` one.
-		return $this->checkAssetsCall( $node );
 	}
 
-	private function checkAsset( string $path, Node $node ): void {
+	private function checkAsset( string $path, int $line ): void {
 		if ( ! preg_match(
 			'#(?P<path>.*)(\.js|\.css)$#',
 			$path,
@@ -124,7 +146,7 @@ $visitor   = new class extends NodeVisitorAbstract {
 			printf(
 				"Error at %s:%d\n└── Asset %s doesn't exist.\n",
 				$this->currentFile->getRealPath(),
-				$node->getLine(),
+				$line,
 				'.' . $assetFile
 			);
 		}
@@ -138,7 +160,7 @@ $visitor   = new class extends NodeVisitorAbstract {
 				$this->unregisteredCssAsset[ $cssFile ] = [
 					'jsAssetFile' => $assetFile,
 					'file'        => $this->currentFile->getRealPath(),
-					'line'        => $node->getLine()
+					'line'        => $line
 				];
 			}
 		} else {
@@ -178,7 +200,7 @@ $visitor   = new class extends NodeVisitorAbstract {
 				continue;
 			}
 
-			$this->checkAsset( $path, $node );
+			$this->checkAsset( $path, $node->getLine() );
 		}
 
 		return $node;
@@ -187,12 +209,13 @@ $visitor   = new class extends NodeVisitorAbstract {
 	private function checkAssetCall( FuncCall $node ): Node {
 		// The third argument is the asset path; if it's a .js or .css file, make sure it exists in relation to ./build.
 		if ( isset( $node->args[2] ) && $node->args[2]->value instanceof Node\Scalar\String_ ) {
-			$this->checkAsset( $node->args[2]->value->value, $node );
+			$this->checkAsset( $node->args[2]->value->value, $node->getLine() );
 		}
 
 		return $node;
 	}
 };
+$traverser->addVisitor( new NameResolver() );
 $traverser->addVisitor( $visitor );
 $parser = ( new ParserFactory )->createForNewestSupportedVersion();
 
