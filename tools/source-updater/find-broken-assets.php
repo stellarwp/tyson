@@ -205,10 +205,13 @@ foreach ( $files as $file ) {
 }
 
 $registeredAssets = $visitor->getRegisteredAssets();
+$foundSome        = false;
 foreach ( $visitor->getUnregisteredCssAssets() as $cssFile => $cssFileData ) {
 	if ( isset( $registeredAssets[ $cssFile ] ) ) {
 		continue;
 	}
+
+	$foundSome = true;
 	printf(
 		"Warning at %s:%d\n└── JS Asset %s is registered, but CSS asset %s is not.\n",
 		$cssFileData['file'],
@@ -217,4 +220,11 @@ foreach ( $visitor->getUnregisteredCssAssets() as $cssFile => $cssFileData ) {
 		getcwd() . $cssFile
 	);
 }
+
+if ( $foundSome ) {
+	exit( 1 );
+}
+
+printf( "No broken assets found, congratulations!\n" );
+exit( 0 );
 
