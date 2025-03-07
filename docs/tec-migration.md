@@ -1,5 +1,19 @@
 ## Converting a plugin to use tyson and wp-scripts
 
+### Build assets using the existing system
+
+To ease later debugging of missing assets, build the assets using the existing system:
+
+```js
+nvm
+use && npm
+ci && npm
+run
+build
+```
+
+Depending on the plugin you're working on, you will have some assets built in the `/src/resources` directory.
+
 ### Update the node version to 18.17.0
 
 Set, in the plugin `.nvmrc` file, the version of `node` used by the plugin to `18.17.0`:
@@ -322,6 +336,133 @@ location:
 
 ### Loading assets from the /build directory
 
-TODO
+The next step is instructing the PHP code to load assets from teh `/build` directory in place of the `/src/resources`
+one.
+
+First register, in the plugin bootstrap code, two new assets groups using the `stellarwp/assets` library:
+
+```php
+<?php
+
+use TEC\Common\StellarWP\Assets\Config as Assets_Config;
+
+/*
+ * Register the `/build` directory assets as a different group to ensure back-compatibility.
+ * This needs to happen early in the plugin bootstrap routine.
+ */
+Assets_Config::add_group_path(
+    self::class,
+    self::instance()->plugin_path . 'build',
+    '',
+    true
+);
+
+/*
+ * Register the `/build` directory as root for packages.
+ * The difference from the group registration above is that packages are not expected to use prefix directories
+ * like `/js` or `/css`.
+ */
+Assets_Config::add_group_path(
+    self::class . '-packages',
+    self::instance()->plugin_path . 'build',
+    '',
+    false
+);
+```
+
+The code above will register two new assets groups: one called as the plugin main class (e.g. `Tribe__Events__Main` for
+The Events Calendar plugin), and another for the packages (e.g. `Tribe__Events__Main-packages` for The Events Calendar).
+These groups will load code from the `/build` directory instead of the `src/resources` one.
+
+Next update the code using `tribe_asset` and `tribe_assets` to use the new groups.  
+To do this you're replacing teh `tribe_asset` and `tribe_assets` functions with the `tec_asset` and `tec_assets`
+function respectively.  
+These functions are drop-in replacements for the originals, but they will load assets from the `/build` directory
+instead of the `src/resources` one.
+
+Run a dry-run of the code update first from the plugin root directory:
+
+```bash
+SRC="$(pwd)/src" && \
+cd ./node_modules/@stellarwp/tyson/tools/source-updater && \
+composer install && \
+vendor/bin/rector process --config=rector.php "$SRC" --dry-run && \
+cd -
+```
+
+If it looks like the update are correct, and are happening in the right places, then run the actual update:
+
+```bash
+SRC="$(pwd)/src" && \
+cd ./node_modules/@stellarwp/tyson/tools/source-updater && \
+composer install && \
+vendor/bin/rector process --config=rector.php "$SRC" && \
+cd -
+```
+
+Now check the asset registrations, redirected from the `/src/resoureces` directory to the `/build` one are correct:
+
+```bash
+php ./node_modules/@stellarwp/tyson/tools/source-updater/find-broken-assets.php "$(pwd)/src"
+```
+
+The script will check if JS or CSS assets registered with any one of the following functions exist in the `/build`
+directory:
+
+* `wp_register_script`
+* `wp_register_style`
+* `wp_enqueue_script`
+* `wp_enqueue_style`
+* `tribe_asset`
+* `tribe_assets`
+* `tec_asset`
+* `tec_assets`
+* `TEC\Common\StellarWP\Assets\Asset::add`,
+* `TEC\Common\Asset`
+
+You should get a message saying that no broken assets where found but, on first run, that might not be the case.
+
+For each not found asset, check if the file exists somewhere in the `/build` directory:
+
+```bash
+find ./build -type f -name 'missing-asset.js'
+```
+
+If there are no results, then check if the asset existed to begin with, in the `/src/resources` directory:
+
+```bash
+find ./src/resources -type f -name 'missing-asset.js'
+```
+
+If there is a result, then you will have to update the `webpack.config.js` file to build correctly all the assets and
+make sure
+that all things that were registered and enqueued from the `/src/resources` directory in the previous system are still
+correctly registered and enqueued from the `/build` directory.
+
+If there are no results, then the assets is a left-over from some work that was never unregistered.  
+The previous system was, in this sense, permissive allowing the registration of non-existing assets and enqueuing them
+without checking if they existed or not.
+
+Before you remove the asset registration, make sure there are no dependants on the asset in any other plugin:
+
+```bash
+php ./node_modules/@stellarwp/tyson/tools/source-updater/find-dependants.php \
+  tribe-common-gutenberg-vendor "$(dirname $(pwd))"
+```
+
+If no dependants are found, then remove the asset registration, you've just reduced entropy.
+
+If you found at least one dependent on an asset that will never be enqueued since it does not exist, then it's likely
+the dependent asset, as well, it's never used. Take some care, but you can likely remove it.
+
+> Note: the above command assumes you're running this from the root directory of a plugin placed in the `plugins`
+> directory of your local development WordPress installation and that all other plugins from the TEC suite have been
+> cloned in the same `plugins` directory, as siblings of the plugin you're working on.
+
+### Holistic testing
+
+Something might have escaped the automated scripts: get around the applicable pages and make sure all things work
+fine.  
+If not, rinse and repeat the steps above, good luck!
 
 [1]: https://github.com/stellarwp/tyson-tools
