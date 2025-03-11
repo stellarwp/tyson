@@ -12,7 +12,7 @@
     "format": "prettier --write 'src/**/*.{ts,tsx}' 'tests/**/*.{ts,tsx}' package.json jest.config.js tsconfig.json",
     "format:check": "prettier --check 'src/**/*.{ts,tsx}' 'tests/**/*.{ts,tsx}' package.json jest.config.js tsconfig.json",
     "test": "jest",
-    "prepare": "npm run format && npm run build && npm run test"
+    "pre-commit": "npm run format:check && npm run build && npm run test"
   },
   "keywords": [
     "stellarwp",
