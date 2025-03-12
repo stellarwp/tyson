@@ -6,4 +6,3 @@ jest.config.js
 tsconfig.json
 .nvmrc
 docs
-tools
