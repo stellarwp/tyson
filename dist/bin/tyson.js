@@ -103,7 +103,7 @@ async function initWebpackConfig(preset, force) {
         fs_1.default.writeFileSync(destinationFile, compiled);
         console.log(`${destinationFile} written`);
     }
-    console.log(`Custom configuration created with preset: ${preset}`);
+    console.log(`Custom configuration created with preset '${preset}' and namespace '${templateVars?.namespace || "tec"}'.`);
 }
 console.log(`${name} v${version}\n${description}\n`);
 const argv = (0, yargs_1.default)((0, helpers_1.hideBin)(process.argv))

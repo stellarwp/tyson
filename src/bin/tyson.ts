@@ -102,7 +102,9 @@ async function initWebpackConfig(
     console.log(`${destinationFile} written`);
   }
 
-  console.log(`Custom configuration created with preset: ${preset}`);
+  console.log(
+    `Custom configuration created with preset '${preset}' and namespace '${templateVars?.namespace || "tec"}'.`,
+  );
 }
 
 console.log(`${name} v${version}\n${description}\n`);
