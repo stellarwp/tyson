@@ -435,3 +435,41 @@ Something might have escaped the automated scripts: navigate around the applicab
 If not, rinse and repeat the steps above, good luck!
 
 [1]: https://github.com/stellarwp/tyson-tools
+
+const customEntryPoints = compileCustomEntryPoints({
+   '/src/resources/js': TECLegacyJs,
+   '/some-other-location/js': TECLegacyJs,
+});
+
+You can also create schemas with custom namespaces using the schema creator functions:
+
+```js
+import {
+  createTECLegacyJs,
+  createTECPackage,
+  createTECPostCss,
+  createTECLegacyBlocksFrontendPostCss,
+} from "@stellarwp/tyson";
+
+// Using string namespace
+const customLegacyJs = createTECLegacyJs("my-plugin");
+const customPackage = createTECPackage("my-plugin");
+
+// Using array-based namespace
+const customPostCss = createTECPostCss(["my", "plugin", "css"]);
+const customBlocksCss = createTECLegacyBlocksFrontendPostCss(["my", "plugin", "blocks"]);
+
+const customEntryPoints = compileCustomEntryPoints({
+  '/src/resources/js': customLegacyJs,
+  '/src/packages': customPackage,
+  '/src/resources/postcss': customPostCss,
+  '/src/styles': customBlocksCss,
+});
+```
+
+This allows you to use the same schema types with different namespaces, which is particularly useful when:
+- Working with multiple plugins that need different namespaces
+- Creating modular builds with distinct namespace hierarchies
+- Maintaining separation between different parts of your application
+
+If you skip this section, then remove the section using the `TECLegacyJs` schema in the `customEntryPoints` object from the `webpack.config.js` file.

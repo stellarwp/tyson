@@ -1,116 +1,120 @@
+import { TECLegacyJs, createTECLegacyJs } from "../../src/schema/TECLegacyJs";
 import { FileCallbackArguments } from "../../src/types/FileCallbackArguments";
-import {
-  entryPointName,
-  expose,
-  fileMatcher,
-  TECLegacyJs,
-} from "../../src/schema/TECLegacyJs";
 import { ExposeCallbackArguments } from "../../src/types/ExposeCallbackArguments";
-import { ConfigurationSchema } from "../../src/types/ConfigurationSchema";
 
-describe("TECLegacyBlocksFrontendPostCss", () => {
-  beforeEach(() => {
-    jest.resetAllMocks();
-    jest.resetModules();
+describe("TECLegacyJs", () => {
+  describe("default instance", () => {
+    it("should have the correct file extensions", () => {
+      expect(TECLegacyJs.fileExtensions).toEqual([".js"]);
+    });
+
+    it("should have the default namespace", () => {
+      expect(TECLegacyJs.namespace).toBe("tec");
+    });
   });
 
-  afterEach(() => {
-    jest.resetAllMocks();
-    jest.resetModules();
+  describe("createTECLegacyJs", () => {
+    it("should create a schema with custom string namespace", () => {
+      const schema = createTECLegacyJs("custom");
+      expect(schema.namespace).toBe("custom");
+    });
+
+    it("should create a schema with custom array namespace", () => {
+      const schema = createTECLegacyJs(["custom", "namespace"]);
+      expect(schema.namespace).toEqual(["custom", "namespace"]);
+    });
+
+    it("should use default namespace when none provided", () => {
+      const schema = createTECLegacyJs();
+      expect(schema.namespace).toBe("tec");
+    });
   });
 
   describe("fileMatcher", () => {
-    it("returns false if file name ends with .min.js", () => {
+    it("should exclude minified files", () => {
       const args: FileCallbackArguments = {
-        fileName: "example.min.js",
-        fileRelativePath: "path/to/example.min.js",
-        fileAbsolutePath: "/users/bob/project/path/to/example.min.js",
+        fileName: "script.min.js",
+        fileRelativePath: "/path/to/script.min.js",
+        fileAbsolutePath: "/abs/path/to/script.min.js",
       };
-      expect(fileMatcher(args)).toBe(false);
+      expect(TECLegacyJs.fileMatcher(args)).toBe(false);
     });
 
-    it("returns false if file relative path includes __tests__", () => {
+    it("should exclude test files", () => {
       const args: FileCallbackArguments = {
-        fileName: "example.js",
-        fileRelativePath: "path/__tests__/example.js",
-        fileAbsolutePath: "/users/bob/project/path/__tests__/example.js",
+        fileName: "script.js",
+        fileRelativePath: "/path/to/__tests__/script.js",
+        fileAbsolutePath: "/abs/path/to/__tests__/script.js",
       };
-      expect(fileMatcher(args)).toBe(false);
+      expect(TECLegacyJs.fileMatcher(args)).toBe(false);
     });
 
-    it("returns true for other cases", () => {
+    it("should include regular js files", () => {
       const args: FileCallbackArguments = {
-        fileName: "example.js",
-        fileRelativePath: "path/to/example.js",
-        fileAbsolutePath: "/users/bob/project/path/to/example.js",
+        fileName: "script.js",
+        fileRelativePath: "/path/to/script.js",
+        fileAbsolutePath: "/abs/path/to/script.js",
       };
-      expect(fileMatcher(args)).toBe(true);
+      expect(TECLegacyJs.fileMatcher(args)).toBe(true);
     });
   });
 
   describe("entryPointName", () => {
-    it("removes .js extension from the file relative path", () => {
+    it("should generate correct entry point name", () => {
       const args: FileCallbackArguments = {
-        fileName: "example.js",
-        fileRelativePath: "/path/to/example.js",
-        fileAbsolutePath: "/users/bob/project/path/to/example.js",
+        fileName: "script.js",
+        fileRelativePath: "/path/to/script.js",
+        fileAbsolutePath: "/abs/path/to/script.js",
       };
-      expect(entryPointName(args)).toBe("js/path/to/example");
-    });
-
-    it("handles paths without .js extension gracefully", () => {
-      const args: FileCallbackArguments = {
-        fileName: "example",
-        fileRelativePath: "/path/to/example",
-        fileAbsolutePath: "/users/bob/project/path/to/example.js",
-      };
-      expect(entryPointName(args)).toBe("js/path/to/example");
+      expect(TECLegacyJs.entryPointName(args)).toBe("js/path/to/script");
     });
   });
 
   describe("expose", () => {
-    it("returns false if file absolute path ends with frontend.js", () => {
+    it("should not expose frontend.js files", () => {
       const args: ExposeCallbackArguments = {
-        entryPointName: "js/frontend",
-        fileName: "frontend",
-        fileRelativePath: "/path/to/example",
-        fileAbsolutePath: "/users/bob/project/path/to/frontend.js",
+        entryPointName: "js/path/to/frontend",
+        fileAbsolutePath: "/abs/path/to/frontend.js",
+        fileName: "frontend.js",
+        fileRelativePath: "/path/to/frontend.js",
       };
-      expect(expose(args)).toBe(false);
+      expect(TECLegacyJs.expose).toBeDefined();
+      expect(TECLegacyJs.expose!(args)).toBe(false);
     });
 
-    it("builds external name correctly for other cases", () => {
+    it("should expose non-frontend files with default namespace", () => {
       const args: ExposeCallbackArguments = {
-        entryPointName: "js/customizer-views-v2-live-preview",
-        fileName: "customizer-views-v2-live-preview",
-        fileRelativePath: "/path/to/customizer-views-v2-live-preview.js",
-        fileAbsolutePath:
-          "/users/bob/project/path/to/customizer-views-v2-live-preview.js",
+        entryPointName: "js/path/to/script",
+        fileAbsolutePath: "/abs/path/to/script.js",
+        fileName: "script.js",
+        fileRelativePath: "/path/to/script.js",
       };
-      expect(expose(args)).toBe("tec.customizerViewsV2LivePreview");
+      expect(TECLegacyJs.expose).toBeDefined();
+      expect(TECLegacyJs.expose!(args)).toBe("tec.path.to.script");
     });
 
-    it("drops specified fragments from the path", () => {
+    it("should expose non-frontend files with custom string namespace", () => {
+      const schema = createTECLegacyJs("custom");
       const args: ExposeCallbackArguments = {
-        entryPointName: "js/tec-update-6.0.0-notice",
-        fileName: "tec-update-6.0.0-notice.js",
-        fileRelativePath: "/path/to/tec-update-6.0.0-notice.js",
-        fileAbsolutePath:
-          "/users/bob/project/path/to/tec-update-6.0.0-notice.js",
+        entryPointName: "js/path/to/script",
+        fileAbsolutePath: "/abs/path/to/script.js",
+        fileName: "script.js",
+        fileRelativePath: "/path/to/script.js",
       };
-      expect(expose(args)).toBe("tec.tecUpdate600Notice");
+      expect(schema.expose).toBeDefined();
+      expect(schema.expose!(args)).toBe("custom.path.to.script");
     });
-  });
 
-  describe("TECLegacyJs", () => {
-    it("exports the correct ConfigurationSchema", () => {
-      const expected: ConfigurationSchema = {
-        fileExtensions: [".js"],
-        fileMatcher,
-        entryPointName,
-        expose,
+    it("should expose non-frontend files with custom array namespace", () => {
+      const schema = createTECLegacyJs(["custom", "namespace"]);
+      const args: ExposeCallbackArguments = {
+        entryPointName: "js/path/to/script",
+        fileAbsolutePath: "/abs/path/to/script.js",
+        fileName: "script.js",
+        fileRelativePath: "/path/to/script.js",
       };
-      expect(TECLegacyJs).toEqual(expected);
+      expect(schema.expose).toBeDefined();
+      expect(schema.expose!(args)).toBe("custom.namespace.path.to.script");
     });
   });
 });

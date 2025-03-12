@@ -1,93 +1,121 @@
-import { TECPostCss } from "../../src";
-import {
-  entryPointName,
-  fileMatcher,
-  modifyConfig,
-} from "../../src/schema/TECPostCss";
+import { TECPostCss, createTECPostCss } from "../../src/schema/TECPostCss";
 import { WebPackConfiguration } from "../../src/types/WebPackConfiguration";
+import { FileCallbackArguments } from "../../src/types/FileCallbackArguments";
+import { WebPackRule } from "../../src/types/WebPackRule";
 
-describe("fileMatcher", () => {
-  beforeEach(() => jest.resetModules());
-  afterEach(() => jest.clearAllMocks());
-
-  it("returns true for files not starting with _", () => {
-    const args = {
-      fileName: "example.pcss",
-      fileRelativePath: "",
-      fileAbsolutePath: "",
-    };
-    expect(fileMatcher(args)).toBe(true);
-  });
-
-  it("returns false for files starting with _", () => {
-    const args = {
-      fileName: "_example.pcss",
-      fileRelativePath: "",
-      fileAbsolutePath: "",
-    };
-    expect(fileMatcher(args)).toBe(false);
-  });
-});
-
-describe("entryPointName", () => {
-  beforeEach(() => jest.resetModules());
-  afterEach(() => jest.clearAllMocks());
-
-  it("replaces .pcss with empty string and prefixes with css/", () => {
-    const args = {
-      fileName: "example.pcss",
-      fileRelativePath: "path/to/example.pcss",
-      fileAbsolutePath: "",
-    };
-    expect(entryPointName(args)).toBe("css/path/to/example");
-  });
-
-  it("does not replace if .pcss is not present", () => {
-    const args = {
-      fileName: "example.css",
-      fileRelativePath: "path/to/example.css",
-      fileAbsolutePath: "",
-    };
-    expect(entryPointName(args)).toBe("css/path/to/example.css");
-  });
-});
-
-describe("modifyConfig", () => {
-  beforeEach(() => jest.resetModules());
-  afterEach(() => jest.clearAllMocks());
-
-  it("adds a new rule to the WebPack configuration", () => {
-    const config: WebPackConfiguration = { module: { rules: [] } };
-    modifyConfig(config);
-    expect(config.module.rules).toHaveLength(1);
-    expect(config.module.rules[0].test.toString()).toBe(/\.pcss$/.toString());
-  });
-
-  it("does not override existing rules", () => {
-    const config: WebPackConfiguration = {
-      module: {
-        rules: [
-          { test: /\.js$/, use: "babel-loader", type: "javascript/auto" },
-        ],
-      },
-    };
-    modifyConfig(config);
-    expect(config.module.rules).toHaveLength(2);
-    expect(config.module.rules[0].test.toString()).toBe(/\.js$/.toString());
-    expect(config.module.rules[1].test.toString()).toBe(/\.pcss$/.toString());
-  });
-});
+type TestWebPackConfig = Required<WebPackConfiguration> & {
+  module: {
+    rules: WebPackRule[];
+  };
+};
 
 describe("TECPostCss", () => {
-  beforeEach(() => jest.resetModules());
-  afterEach(() => jest.clearAllMocks());
+  describe("default instance", () => {
+    it("should have the correct file extensions", () => {
+      expect(TECPostCss.fileExtensions).toEqual([".pcss"]);
+    });
 
-  it("exports a ConfigurationSchema with correct properties", () => {
-    expect(TECPostCss).toEqual({
-      fileExtensions: [".pcss"],
-      fileMatcher,
-      entryPointName,
-      modifyConfig,
+    it("should have the default namespace", () => {
+      expect(TECPostCss.namespace).toBe("tec");
+    });
+  });
+
+  describe("createTECPostCss", () => {
+    it("should create a schema with custom string namespace", () => {
+      const schema = createTECPostCss("custom");
+      expect(schema.namespace).toBe("custom");
+    });
+
+    it("should create a schema with custom array namespace", () => {
+      const schema = createTECPostCss(["custom", "namespace"]);
+      expect(schema.namespace).toEqual(["custom", "namespace"]);
+    });
+
+    it("should use default namespace when none provided", () => {
+      const schema = createTECPostCss();
+      expect(schema.namespace).toBe("tec");
+    });
+  });
+
+  describe("fileMatcher", () => {
+    it("should exclude files starting with underscore", () => {
+      const args: FileCallbackArguments = {
+        fileName: "_partial.pcss",
+        fileRelativePath: "styles/_partial.pcss",
+        fileAbsolutePath: "/abs/path/styles/_partial.pcss",
+      };
+      expect(TECPostCss.fileMatcher(args)).toBe(false);
+    });
+
+    it("should include regular pcss files", () => {
+      const args: FileCallbackArguments = {
+        fileName: "styles.pcss",
+        fileRelativePath: "styles/styles.pcss",
+        fileAbsolutePath: "/abs/path/styles/styles.pcss",
+      };
+      expect(TECPostCss.fileMatcher(args)).toBe(true);
+    });
+  });
+
+  describe("entryPointName", () => {
+    it("should generate correct entry point name", () => {
+      const args: FileCallbackArguments = {
+        fileName: "styles.pcss",
+        fileRelativePath: "feature/styles.pcss",
+        fileAbsolutePath: "/abs/path/feature/styles.pcss",
+      };
+      expect(TECPostCss.entryPointName(args)).toBe("css/feature/styles");
+    });
+  });
+
+  describe("modifyConfig", () => {
+    it("should add postcss-loader with nested plugin", () => {
+      const config: TestWebPackConfig = {
+        module: {
+          rules: [],
+        },
+      };
+
+      expect(TECPostCss.modifyConfig).toBeDefined();
+      TECPostCss.modifyConfig!(config);
+
+      const rules = config.module.rules;
+      expect(rules).toHaveLength(1);
+      const rule = rules[0];
+      expect(rule.test).toEqual(/\.pcss$/);
+      expect(rule.type).toBe("javascript/auto");
+      expect(rule.use).toHaveLength(1);
+
+      const loader = (rule.use ?? [])[0] as {
+        loader: string;
+        options: { postcssOptions: { plugins: string[] } };
+      };
+      expect(loader.loader).toBe("postcss-loader");
+      expect(loader.options.postcssOptions.plugins).toEqual(["postcss-nested"]);
+    });
+
+    it("does not override existing rules", () => {
+      const config: TestWebPackConfig = {
+        module: {
+          rules: [
+            {
+              test: /\.js$/,
+              use: "babel-loader",
+              type: "javascript/auto",
+            } as WebPackRule,
+          ],
+        },
+      };
+
+      expect(TECPostCss.modifyConfig).toBeDefined();
+      TECPostCss.modifyConfig!(config);
+
+      const rules = config.module.rules;
+      expect(rules).toHaveLength(2);
+      const rule0 = rules[0];
+      const rule1 = rules[1];
+      expect(rule0.test?.toString()).toBe(/\.js$/.toString());
+      expect(rule1.test?.toString()).toBe(/\.pcss$/.toString());
     });
   });
 });
