@@ -1,38 +1,38 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TECLegacyBlocksFrontendPostCss = void 0;
-exports.fileMatcher = fileMatcher;
-exports.entryPointName = entryPointName;
-const path_1 = require("path");
+exports.createTECLegacyBlocksFrontendPostCss = createTECLegacyBlocksFrontendPostCss;
 /**
- * Matches files only if they are called `frontend.pcss`.
+ * Creates a TECLegacyBlocksFrontendPostCss schema with a custom namespace.
  *
- * @param {FileCallbackArguments} args - The arguments containing the file name to match.
- * @returns {boolean} - True if the file name is `frontend.pcss`, otherwise false.
+ * @param {string|string[]} [namespace="tec"] - The namespace to use for the schema.
+ * @returns {ConfigurationSchema} The configured schema.
  */
-function fileMatcher({ fileName }) {
-    return fileName === "frontend.pcss";
+function createTECLegacyBlocksFrontendPostCss(namespace = "tec") {
+    /**
+     * Determines if a file should be included based on its name.
+     * @param {FileCallbackArguments} args - The arguments containing the file name.
+     * @returns {boolean} - True if the file name does not start with "_", otherwise false.
+     */
+    function fileMatcher({ fileName }) {
+        return !fileName.startsWith("_");
+    }
+    /**
+     * Generates an entry point name for a given file path.
+     * @param {FileCallbackArguments} args - The arguments containing the relative file path.
+     * @returns {string} - The generated entry point name with ".pcss" replaced by an empty string.
+     */
+    function entryPointName({ fileRelativePath }) {
+        return fileRelativePath.replace(".pcss", "");
+    }
+    return {
+        fileExtensions: [".pcss"],
+        namespace,
+        fileMatcher,
+        entryPointName,
+    };
 }
 /**
- * Builds and returns the compilation entry point name.
- * E.g. `app/classic-event-details/frontend.css`
- *
- * @param {FileCallbackArguments} args - The arguments containing the relative path of the file.
- * @returns {string} - The constructed entry point name.
+ * Default TECLegacyBlocksFrontendPostCss schema with "tec" namespace.
  */
-function entryPointName({ fileRelativePath, }) {
-    return "app/" + (0, path_1.basename)((0, path_1.dirname)(fileRelativePath)) + "/frontend";
-}
-/**
- * Configuration schema for TECLegacyBlocksFrontendPostCss.
- *
- * @type {ConfigurationSchema}
- * @property {string[]} fileExtensions - The file extensions to match, in this case only `.pcss`.
- * @property {function} fileMatcher - Function to match specific files.
- * @property {function} entryPointName - Function to generate the entry point name based on file path.
- */
-exports.TECLegacyBlocksFrontendPostCss = {
-    fileExtensions: [".pcss"], // Only match `.pcss` files.
-    fileMatcher,
-    entryPointName,
-};
+exports.TECLegacyBlocksFrontendPostCss = createTECLegacyBlocksFrontendPostCss();

@@ -101,7 +101,18 @@ Now run the `tyson` script that will scaffold the custom WebPack configuration f
 node_modules/.bin/tyson init --preset tec
 ```
 
-You will be asked to define a namespace for the compiled assets, pick one that starts with `tec.` and follows the `camelCase` naming convention; e.g. `tec.events.myPlugin` or `tec.tickets.myPlugin`.
+You will be asked to define a namespace for the compiled assets, pick one that starts with `tec.` and follows the `camelCase` naming convention; e.g. `tec.myPlugin` for a plugin called "My Plugin" part of the TEC suite.
+
+You can specify the namespace either as a single string (e.g., `"tec.myPlugin"`) or as an array of segments (e.g., `["tec", "myPlugin"]`). The array-based approach is particularly useful when you want to maintain clearer separation between namespace segments or when working with dynamic namespace generation.
+
+For example:
+```js
+// Using string-based namespace
+customEntryPoints['app/main'] = exposeEntry('tec.common.app.main', __dirname + '/src/modules/index.js');
+
+// Using array-based namespace (equivalent)
+customEntryPoints['app/main'] = exposeEntry(['tec', 'common', 'app', 'main'], __dirname + '/src/modules/index.js');
+```
 
 The custom configuration file is composed of different presets and tweaks to accomodate for TEC's peculiar practices and file organization.
 
@@ -424,3 +435,41 @@ Something might have escaped the automated scripts: navigate around the applicab
 If not, rinse and repeat the steps above, good luck!
 
 [1]: https://github.com/stellarwp/tyson-tools
+
+const customEntryPoints = compileCustomEntryPoints({
+   '/src/resources/js': TECLegacyJs,
+   '/some-other-location/js': TECLegacyJs,
+});
+
+You can also create schemas with custom namespaces using the schema creator functions:
+
+```js
+import {
+  createTECLegacyJs,
+  createTECPackage,
+  createTECPostCss,
+  createTECLegacyBlocksFrontendPostCss,
+} from "@stellarwp/tyson";
+
+// Using string namespace
+const customLegacyJs = createTECLegacyJs("my-plugin");
+const customPackage = createTECPackage("my-plugin");
+
+// Using array-based namespace
+const customPostCss = createTECPostCss(["my", "plugin", "css"]);
+const customBlocksCss = createTECLegacyBlocksFrontendPostCss(["my", "plugin", "blocks"]);
+
+const customEntryPoints = compileCustomEntryPoints({
+  '/src/resources/js': customLegacyJs,
+  '/src/packages': customPackage,
+  '/src/resources/postcss': customPostCss,
+  '/src/styles': customBlocksCss,
+});
+```
+
+This allows you to use the same schema types with different namespaces, which is particularly useful when:
+- Working with multiple plugins that need different namespaces
+- Creating modular builds with distinct namespace hierarchies
+- Maintaining separation between different parts of your application
+
+If you skip this section, then remove the section using the `TECLegacyJs` schema in the `customEntryPoints` object from the `webpack.config.js` file.

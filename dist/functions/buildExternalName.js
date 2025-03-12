@@ -7,7 +7,7 @@ exports.buildExternalName = buildExternalName;
  * As an example this function would turn `/app/feature/turbo-name-v6.0.0-deluxe-edition`
  * to `app.feature.turboNameV600DeluxeEdition`.
  *
- * @param {string} namespace The path the entry point should be prefixed with., e.g. `acme`.
+ * @param {string|string[]} namespace The namespace(s) the entry point should be prefixed with., e.g. `acme` or `['acme', 'plugin']`.
  * @param {string} relativePath The path the entry point should be prefixed with., e.g. `/app/feature/turbo-name`.
  * @param {string[]} dropFrags A list of path fragments to drop from the entry point name., e.g. `['app', 'js']`
  * to get rid of the `app` and `js` parts from the entry point relative path.
@@ -15,13 +15,16 @@ exports.buildExternalName = buildExternalName;
  * @return {string} The external name of the entry point.
  */
 function buildExternalName(namespace, relativePath, dropFrags = []) {
-    if (!namespace) {
+    if (!namespace || (Array.isArray(namespace) && namespace.length === 0)) {
         throw new Error("Namespace cannot be empty");
     }
     if (!relativePath) {
         throw new Error("Name cannot be empty");
     }
-    return (namespace +
+    const namespaceString = Array.isArray(namespace)
+        ? namespace.join(".")
+        : namespace;
+    return (namespaceString +
         "." +
         relativePath
             .split("/")

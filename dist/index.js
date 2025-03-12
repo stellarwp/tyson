@@ -1,11 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WindowAssignPropertiesPlugin = exports.preprocessPostcssWithPlugins = exports.usesLoader = exports.modifyRulesInConfig = exports.ruleUsesLoader = exports.prependRuleToRuleInConfig = exports.isPackageRootIndex = exports.exposeEntry = exports.doNotPrefixSVGIdsClasses = exports.compileCustomEntryPoints = exports.buildExternalName = exports.TECPackage = exports.TECLegacyBlocksFrontendPostCss = exports.TECPostCss = exports.TECLegacyJs = void 0;
+exports.WindowAssignPropertiesPlugin = exports.preprocessPostcssWithPlugins = exports.usesLoader = exports.modifyRulesInConfig = exports.ruleUsesLoader = exports.prependRuleToRuleInConfig = exports.isPackageRootIndex = exports.exposeEntry = exports.doNotPrefixSVGIdsClasses = exports.compileCustomEntryPoints = exports.buildExternalName = exports.createTECPackage = exports.TECPackage = exports.createTECLegacyBlocksFrontendPostCss = exports.TECLegacyBlocksFrontendPostCss = exports.createTECPostCss = exports.TECPostCss = exports.createTECLegacyJs = exports.TECLegacyJs = void 0;
 const schema_1 = require("./schema");
 Object.defineProperty(exports, "TECLegacyBlocksFrontendPostCss", { enumerable: true, get: function () { return schema_1.TECLegacyBlocksFrontendPostCss; } });
+Object.defineProperty(exports, "createTECLegacyBlocksFrontendPostCss", { enumerable: true, get: function () { return schema_1.createTECLegacyBlocksFrontendPostCss; } });
 Object.defineProperty(exports, "TECLegacyJs", { enumerable: true, get: function () { return schema_1.TECLegacyJs; } });
+Object.defineProperty(exports, "createTECLegacyJs", { enumerable: true, get: function () { return schema_1.createTECLegacyJs; } });
 Object.defineProperty(exports, "TECPackage", { enumerable: true, get: function () { return schema_1.TECPackage; } });
+Object.defineProperty(exports, "createTECPackage", { enumerable: true, get: function () { return schema_1.createTECPackage; } });
 Object.defineProperty(exports, "TECPostCss", { enumerable: true, get: function () { return schema_1.TECPostCss; } });
+Object.defineProperty(exports, "createTECPostCss", { enumerable: true, get: function () { return schema_1.createTECPostCss; } });
 const functions_1 = require("./functions");
 Object.defineProperty(exports, "buildExternalName", { enumerable: true, get: function () { return functions_1.buildExternalName; } });
 Object.defineProperty(exports, "compileCustomEntryPoints", { enumerable: true, get: function () { return functions_1.compileCustomEntryPoints; } });

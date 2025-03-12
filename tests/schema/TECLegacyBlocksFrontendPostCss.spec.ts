@@ -1,95 +1,70 @@
-import { FileCallbackArguments } from "../../src/types/FileCallbackArguments";
 import {
-  entryPointName,
-  fileMatcher,
   TECLegacyBlocksFrontendPostCss,
+  createTECLegacyBlocksFrontendPostCss,
 } from "../../src/schema/TECLegacyBlocksFrontendPostCss";
-
-describe("fileMatcher", () => {
-  beforeEach(() => {
-    jest.resetAllMocks();
-    jest.resetModules();
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
-  test("returns true if file name is 'frontend.pcss'", () => {
-    const args: FileCallbackArguments = {
-      fileName: "frontend.pcss",
-      fileRelativePath: "frontend.pcss",
-      fileAbsolutePath:
-        "/users/bob/project/app/classic-event-details/frontend.pcss",
-    };
-    expect(fileMatcher(args)).toBe(true);
-  });
-
-  test("returns false if file name is not 'frontend.pcss'", () => {
-    const args: FileCallbackArguments = {
-      fileName: "otherfile.pcss",
-      fileRelativePath: "otherfile.pcss",
-      fileAbsolutePath:
-        "/users/bob/project/app/classic-event-details/otherfile.pcss",
-    };
-    expect(fileMatcher(args)).toBe(false);
-  });
-});
-
-describe("entryPointName", () => {
-  beforeEach(() => {
-    jest.resetAllMocks();
-    jest.resetModules();
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
-  test("returns correct entry point name for given relative path", () => {
-    const args: FileCallbackArguments = {
-      fileName: "frontend.pcss",
-      fileRelativePath: "app/classic-event-details/frontend.pcss",
-      fileAbsolutePath:
-        "/users/bob/project/app/classic-event-details/frontend.pcss",
-    };
-    expect(entryPointName(args)).toBe("app/classic-event-details/frontend");
-  });
-});
+import { FileCallbackArguments } from "../../src/types/FileCallbackArguments";
 
 describe("TECLegacyBlocksFrontendPostCss", () => {
-  beforeEach(() => {
-    jest.resetAllMocks();
-    jest.resetModules();
+  describe("default instance", () => {
+    it("should have the correct file extensions", () => {
+      expect(TECLegacyBlocksFrontendPostCss.fileExtensions).toEqual([".pcss"]);
+    });
+
+    it("should have the default namespace", () => {
+      expect(TECLegacyBlocksFrontendPostCss.namespace).toBe("tec");
+    });
   });
 
-  afterEach(() => {
-    jest.restoreAllMocks();
+  describe("createTECLegacyBlocksFrontendPostCss", () => {
+    it("should create a schema with custom string namespace", () => {
+      const schema = createTECLegacyBlocksFrontendPostCss("custom");
+      expect(schema.namespace).toBe("custom");
+    });
+
+    it("should create a schema with custom array namespace", () => {
+      const schema = createTECLegacyBlocksFrontendPostCss([
+        "custom",
+        "namespace",
+      ]);
+      expect(schema.namespace).toEqual(["custom", "namespace"]);
+    });
+
+    it("should use default namespace when none provided", () => {
+      const schema = createTECLegacyBlocksFrontendPostCss();
+      expect(schema.namespace).toBe("tec");
+    });
   });
 
-  test("has correct fileExtensions", () => {
-    expect(TECLegacyBlocksFrontendPostCss.fileExtensions).toEqual([".pcss"]);
+  describe("fileMatcher", () => {
+    it("should exclude files starting with underscore", () => {
+      const args: FileCallbackArguments = {
+        fileName: "_partial.pcss",
+        fileRelativePath: "styles/_partial.pcss",
+        fileAbsolutePath: "/abs/path/styles/_partial.pcss",
+      };
+      expect(TECLegacyBlocksFrontendPostCss.fileMatcher(args)).toBe(false);
+    });
+
+    it("should include regular pcss files", () => {
+      const args: FileCallbackArguments = {
+        fileName: "styles.pcss",
+        fileRelativePath: "styles/styles.pcss",
+        fileAbsolutePath: "/abs/path/styles/styles.pcss",
+      };
+      expect(TECLegacyBlocksFrontendPostCss.fileMatcher(args)).toBe(true);
+    });
   });
 
-  test("uses the correct fileMatcher function", () => {
-    const args: FileCallbackArguments = {
-      fileName: "frontend.pcss",
-      fileRelativePath: "app/classic-event-details/frontend.pcss",
-      fileAbsolutePath:
-        "/users/bob/project/app/classic-event-details/frontend.pcss",
-    };
-    expect(TECLegacyBlocksFrontendPostCss.fileMatcher!(args)).toBe(true);
-  });
-
-  test("uses the correct entryPointName function", () => {
-    const args: FileCallbackArguments = {
-      fileName: "frontend.pcss",
-      fileRelativePath: "app/classic-event-details/frontend.pcss",
-      fileAbsolutePath:
-        "/users/bob/project/app/classic-event-details/frontend.pcss",
-    };
-    expect(TECLegacyBlocksFrontendPostCss.entryPointName!(args)).toBe(
-      "app/classic-event-details/frontend",
-    );
+  describe("entryPointName", () => {
+    it("should generate correct entry point name", () => {
+      const args: FileCallbackArguments = {
+        fileName: "styles.pcss",
+        fileRelativePath: "feature/styles.pcss",
+        fileAbsolutePath: "/abs/path/feature/styles.pcss",
+      };
+      expect(TECLegacyBlocksFrontendPostCss.entryPointName(args)).toBe(
+        "feature/styles",
+      );
+    });
   });
 });

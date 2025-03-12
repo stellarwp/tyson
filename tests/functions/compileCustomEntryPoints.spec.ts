@@ -5,6 +5,7 @@ import {
   compileCustomEntryPoint,
   compileCustomEntryPoints,
 } from "../../src/functions/compileCustomEntryPoints";
+import { buildExternalName } from "../../src/functions/buildExternalName";
 
 describe("compileCustomEntryPoint", () => {
   beforeEach(() => {
@@ -20,7 +21,8 @@ describe("compileCustomEntryPoint", () => {
     const schema: ConfigurationSchema = {
       fileExtensions: [".js"],
       entryPointName: () => "moduleOne",
-      expose: false,
+      expose: () => false,
+      fileMatcher: () => true,
     };
     const relativePath = "/tests/_data/moduleOne";
     const entries: { [k in string]: string | ExposedEntry } = {};
@@ -37,7 +39,9 @@ describe("compileCustomEntryPoint", () => {
     const schema: ConfigurationSchema = {
       fileExtensions: [".js"],
       entryPointName: () => "moduleOne",
-      expose: "acme.product",
+      expose: ({ entryPointName }) =>
+        buildExternalName("acme.product", entryPointName),
+      fileMatcher: () => true,
     };
     const relativePath = "/tests/_data/moduleOne";
     const entries: { [k in string]: string | ExposedEntry } = {};
@@ -59,7 +63,7 @@ describe("compileCustomEntryPoint", () => {
     const schema: ConfigurationSchema = {
       fileExtensions: [".js"],
       entryPointName: () => "moduleOne",
-      expose: false,
+      expose: () => false,
       fileMatcher: () => false,
     };
     const relativePath = "/tests/_data/moduleOne";
@@ -75,7 +79,8 @@ describe("compileCustomEntryPoint", () => {
     const schema: ConfigurationSchema = {
       fileExtensions: [".js"],
       entryPointName: () => "moduleOne",
-      expose: false,
+      expose: () => false,
+      fileMatcher: () => true,
       modifyConfig: jest.fn(),
     };
     const relativePath = "/tests/_data/moduleOne";
@@ -102,17 +107,20 @@ describe("compileCustomEntryPoints", () => {
     const schema1: ConfigurationSchema = {
       fileExtensions: [".js"],
       entryPointName: ({ fileName }) => fileName,
-      expose: false,
+      expose: () => false,
+      fileMatcher: () => true,
     };
     const schema2: ConfigurationSchema = {
       fileExtensions: [".ts"],
       entryPointName: () => "moduleTwo",
-      expose: "acme.moduleTwo",
+      expose: ({ entryPointName }) => buildExternalName("acme", entryPointName),
+      fileMatcher: () => true,
     };
     const schema3: ConfigurationSchema = {
       fileExtensions: [".pcss"],
       entryPointName: () => "moduleThree",
-      expose: false,
+      expose: () => false,
+      fileMatcher: () => true,
     };
     const locations = {
       "/tests/_data/moduleOne": schema1,
@@ -129,7 +137,7 @@ describe("compileCustomEntryPoints", () => {
       moduleTwo: {
         import: `${process.cwd()}/tests/_data/moduleTwo/index.ts`,
         library: {
-          name: "__tyson_window.acme.moduleTwo.moduleTwo",
+          name: "__tyson_window.acme.moduleTwo",
           type: "window",
         },
       },
