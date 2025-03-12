@@ -24,7 +24,9 @@ export function buildExternalName(
     throw new Error("Name cannot be empty");
   }
 
-  const namespaceString = Array.isArray(namespace) ? namespace.join('.') : namespace;
+  const namespaceString = Array.isArray(namespace)
+    ? namespace.join(".")
+    : namespace;
 
   return (
     namespaceString +
