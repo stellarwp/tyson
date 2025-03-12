@@ -103,6 +103,17 @@ node_modules/.bin/tyson init --preset tec
 
 You will be asked to define a namespace for the compiled assets, pick one that starts with `tec.` and follows the `camelCase` naming convention; e.g. `tec.events.myPlugin` or `tec.tickets.myPlugin`.
 
+You can specify the namespace either as a single string (e.g., `"tec.events.myPlugin"`) or as an array of segments (e.g., `["tec", "events", "myPlugin"]`). The array-based approach is particularly useful when you want to maintain clearer separation between namespace segments or when working with dynamic namespace generation.
+
+For example:
+```js
+// Using string-based namespace
+customEntryPoints['app/main'] = exposeEntry('tec.common.app.main', __dirname + '/src/modules/index.js');
+
+// Using array-based namespace (equivalent)
+customEntryPoints['app/main'] = exposeEntry(['tec', 'common', 'app', 'main'], __dirname + '/src/modules/index.js');
+```
+
 The custom configuration file is composed of different presets and tweaks to accomodate for TEC's peculiar practices and file organization.
 
 Before you delve into the code, some key concepts:
