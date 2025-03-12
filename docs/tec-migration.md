@@ -101,9 +101,9 @@ Now run the `tyson` script that will scaffold the custom WebPack configuration f
 node_modules/.bin/tyson init --preset tec
 ```
 
-You will be asked to define a namespace for the compiled assets, pick one that starts with `tec.` and follows the `camelCase` naming convention; e.g. `tec.events.myPlugin` or `tec.tickets.myPlugin`.
+You will be asked to define a namespace for the compiled assets, pick one that starts with `tec.` and follows the `camelCase` naming convention; e.g. `tec.myPlugin` for a plugin called "My Plugin" part of the TEC suite.
 
-You can specify the namespace either as a single string (e.g., `"tec.events.myPlugin"`) or as an array of segments (e.g., `["tec", "events", "myPlugin"]`). The array-based approach is particularly useful when you want to maintain clearer separation between namespace segments or when working with dynamic namespace generation.
+You can specify the namespace either as a single string (e.g., `"tec.myPlugin"`) or as an array of segments (e.g., `["tec", "myPlugin"]`). The array-based approach is particularly useful when you want to maintain clearer separation between namespace segments or when working with dynamic namespace generation.
 
 For example:
 ```js
