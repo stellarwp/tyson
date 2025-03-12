@@ -1,8 +1,12 @@
 import {
   TECLegacyBlocksFrontendPostCss,
+  createTECLegacyBlocksFrontendPostCss,
   TECLegacyJs,
+  createTECLegacyJs,
   TECPackage,
+  createTECPackage,
   TECPostCss,
+  createTECPostCss,
 } from "./schema";
 import {
   buildExternalName,
@@ -21,9 +25,13 @@ import { WindowAssignPropertiesPlugin } from "./webpack";
 // This acts as a façade that will re-export everything on the module.
 export {
   TECLegacyJs,
+  createTECLegacyJs,
   TECPostCss,
+  createTECPostCss,
   TECLegacyBlocksFrontendPostCss,
+  createTECLegacyBlocksFrontendPostCss,
   TECPackage,
+  createTECPackage,
   buildExternalName,
   compileCustomEntryPoints,
   doNotPrefixSVGIdsClasses,
