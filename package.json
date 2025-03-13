@@ -1,6 +1,6 @@
 {
   "name": "@stellarwp/tyson",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Create and manage custom configurations to build projects with @wordpress/scripts.",
   "main": "dist/index.js",
   "bin": {
