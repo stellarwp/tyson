@@ -91,7 +91,13 @@ describe("TECPostCss", () => {
         options: { postcssOptions: { plugins: string[] } };
       };
       expect(loader.loader).toBe("postcss-loader");
-      expect(loader.options.postcssOptions.plugins).toEqual(["postcss-nested"]);
+      expect(loader.options.postcssOptions.plugins).toEqual([
+        "postcss-nested",
+        "postcss-preset-env",
+        "postcss-mixins",
+        "postcss-import",
+        "postcss-custom-media",
+      ]);
     });
 
     it("does not override existing rules", () => {
