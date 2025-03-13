@@ -32,12 +32,7 @@
   },
   "homepage": "https://github.com/stellarwp/tyson",
   "dependencies": {
-    "@types/webpack": "^5.28.5",
-    "postcss-custom-media": "^11.0.5",
-    "postcss-import": "^16.1.0",
-    "postcss-mixins": "^11.0.3",
-    "postcss-nested": "^7.0.2",
-    "postcss-preset-env": "^9.5.0"
+    "@types/webpack": "^5.28.5"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",

@@ -69,10 +69,21 @@ describe("TECPostCss", () => {
   });
 
   describe("modifyConfig", () => {
-    it("should add postcss-loader with nested plugin", () => {
+    it("should add postcss-loader with nested plugin when no previous postcss plugins are set", () => {
       const config: TestWebPackConfig = {
         module: {
-          rules: [],
+          rules: [
+            {
+              test: /\.pcss$/,
+              use: ["postcss-loader"],
+              type: "javascript/auto",
+            },
+            {
+              test: /\.css$/,
+              use: [{ loader: "style-loader" }],
+              type: "javascript/auto",
+            },
+          ],
         },
       };
 
@@ -80,24 +91,105 @@ describe("TECPostCss", () => {
       TECPostCss.modifyConfig!(config);
 
       const rules = config.module.rules;
-      expect(rules).toHaveLength(1);
-      const rule = rules[0];
-      expect(rule.test).toEqual(/\.pcss$/);
-      expect(rule.type).toBe("javascript/auto");
-      expect(rule.use).toHaveLength(1);
+      expect(rules).toHaveLength(2);
+      expect(config).toEqual({
+        module: {
+          rules: [
+            {
+              test: /\.pcss$/,
+              use: [
+                {
+                  loader: "postcss-loader",
+                  options: {
+                    postcssOptions: {
+                      plugins: [
+                        "postcss-nested",
+                        "postcss-preset-env",
+                        "postcss-mixins",
+                        "postcss-import",
+                        "postcss-custom-media",
+                      ],
+                    },
+                  },
+                },
+              ],
+              type: "javascript/auto",
+            },
+            {
+              test: /\.css$/,
+              use: [{ loader: "style-loader" }],
+              type: "javascript/auto",
+            },
+          ],
+        },
+      });
+    });
 
-      const loader = (rule.use ?? [])[0] as {
-        loader: string;
-        options: { postcssOptions: { plugins: string[] } };
+    it("should add postcss-loader with nested plugin when previous postcss plugins are set", () => {
+      const config: TestWebPackConfig = {
+        module: {
+          rules: [
+            {
+              test: /\.pcss$/,
+              use: [
+                {
+                  loader: "postcss-loader",
+                  options: {
+                    postcssOptions: {
+                      plugins: ["postcss-plugin-1", "postcss-plugin-2"],
+                    },
+                  },
+                },
+              ],
+              type: "javascript/auto",
+            },
+            {
+              test: /\.css$/,
+              use: [{ loader: "style-loader" }],
+              type: "javascript/auto",
+            },
+          ],
+        },
       };
-      expect(loader.loader).toBe("postcss-loader");
-      expect(loader.options.postcssOptions.plugins).toEqual([
-        "postcss-nested",
-        "postcss-preset-env",
-        "postcss-mixins",
-        "postcss-import",
-        "postcss-custom-media",
-      ]);
+
+      expect(TECPostCss.modifyConfig).toBeDefined();
+      TECPostCss.modifyConfig!(config);
+
+      const rules = config.module.rules;
+      expect(rules).toHaveLength(2);
+      expect(config).toEqual({
+        module: {
+          rules: [
+            {
+              test: /\.pcss$/,
+              use: [
+                {
+                  loader: "postcss-loader",
+                  options: {
+                    postcssOptions: {
+                      plugins: [
+                        "postcss-nested",
+                        "postcss-preset-env",
+                        "postcss-mixins",
+                        "postcss-import",
+                        "postcss-custom-media",
+                        "postcss-plugin-1",
+                        "postcss-plugin-2",
+                      ],
+                    },
+                  },
+                },
+              ],
+              type: "javascript/auto",
+            },
+            {
+              test: /\.css$/,
+              use: [{ loader: "style-loader" }],
+              type: "javascript/auto",
+            },
+          ],
+        },
+      });
     });
 
     it("does not override existing rules", () => {
@@ -117,11 +209,12 @@ describe("TECPostCss", () => {
       TECPostCss.modifyConfig!(config);
 
       const rules = config.module.rules;
-      expect(rules).toHaveLength(2);
-      const rule0 = rules[0];
-      const rule1 = rules[1];
-      expect(rule0.test?.toString()).toBe(/\.js$/.toString());
-      expect(rule1.test?.toString()).toBe(/\.pcss$/.toString());
+      expect(rules).toHaveLength(1);
+      expect(rules[0]).toEqual({
+        test: /\.js$/,
+        use: "babel-loader",
+        type: "javascript/auto",
+      });
     });
   });
 });

@@ -31,36 +31,22 @@ export function createTECPostCss(
   }
 
   /**
-   * Modifies the WebPack configuration to include a rule for processing PostCSS files in the `src/modules` directory.
-   * The rule uses the `postcss-loader` with the `postcss-nested` plugin to handle nesting syntax.
-   * PostCSS files in the `src/modules` directory use PostCSS nesting, where `&` indicates "this".
-   * By default WordPress scripts would use new CSS nesting syntax where `&` indicates the parent.
-   * We add here the `postcss-nested` plugin to allow the use of `&` to mean "this".
-   * In webpack loaders are applied in LIFO order: this will prepare the PostCSS for the default `postcss-loader`.
+   * By default, the first PostCSS processor the `@wordpress/scripts` library would apply is the `autoprefixer` one.
+   * This plugin expects a correct hierarchical PostCSS structure following the CSS nesting convention (where `&` means
+   * `parent`). TEC code follows the PostCSS nesting convention (where `&` means `this`). Furthermore, TEC relies on other
+   * PostCSS plugins to unroll the code. These plugins, applied before the `autoprefixer` one, will make the PostCSS code
+   * digestable for the `autoprefixer` plugin and the following ones.
    *
    * @param {WebPackConfiguration} config - The WebPack configuration object to be modified.
    */
   function modifyConfig(config: WebPackConfiguration): void {
-    config.module.rules.push({
-      test: /\.pcss$/,
-      use: [
-        {
-          loader: "postcss-loader",
-          options: {
-            postcssOptions: {
-              plugins: [
-                "postcss-nested",
-                "postcss-preset-env",
-                "postcss-mixins",
-                "postcss-import",
-                "postcss-custom-media",
-              ],
-            },
-          },
-        },
-      ],
-      type: "javascript/auto",
-    });
+    preprocessPostcssWithPlugins(config, [
+      "postcss-nested",
+      "postcss-preset-env",
+      "postcss-mixins",
+      "postcss-import",
+      "postcss-custom-media",
+    ]);
   }
 
   return {
