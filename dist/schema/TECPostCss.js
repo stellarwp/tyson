@@ -43,7 +43,13 @@ function createTECPostCss(namespace = "tec") {
                     loader: "postcss-loader",
                     options: {
                         postcssOptions: {
-                            plugins: ["postcss-nested"],
+                            plugins: [
+                                "postcss-nested",
+                                "postcss-preset-env",
+                                "postcss-mixins",
+                                "postcss-import",
+                                "postcss-custom-media",
+                            ],
                         },
                     },
                 },
