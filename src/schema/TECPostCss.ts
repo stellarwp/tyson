@@ -40,7 +40,7 @@ export function createTECPostCss(
    * @param {WebPackConfiguration} config - The WebPack configuration object to be modified.
    */
   function modifyConfig(config: WebPackConfiguration): void {
-    preprocessPostcssWithPlugins(config,[
+    preprocessPostcssWithPlugins(config, [
       "postcss-nested",
       "postcss-preset-env",
       "postcss-mixins",
