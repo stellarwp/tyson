@@ -1,4 +1,4 @@
-import { RawSource, Source } from "webpack-sources";
+import { Source, RawSource } from "webpack-sources";
 import { WindowAssignPropertiesPluginOptions } from "../types/WindowAssignPropertiesPluginOptions";
 
 export class WindowAssignPropertiesPlugin {
@@ -80,7 +80,19 @@ export class WindowAssignPropertiesPlugin {
       },
     );
 
-    return new RawSource(updatedSource);
+    const newSource = new RawSource(updatedSource);
+    /**
+     * Hack: depending on the loaded `webpack-sources` package, the `RawSource` class definition might contain or not
+     * the `buffer` and `isBuffer` methods. If the class does not contain them, then we polyfill them.
+     */
+    if (typeof newSource.buffer !== "function") {
+      newSource.buffer = () => Buffer.from(updatedSource, "utf-8");
+    }
+    if (typeof newSource.isBuffer !== "function") {
+      newSource.isBuffer = () => true;
+    }
+
+    return newSource;
   }
 
   public processAssets(assets: { [key in string]: Source }) {

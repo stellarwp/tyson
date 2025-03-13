@@ -61,7 +61,18 @@ class WindowAssignPropertiesPlugin {
                 .join(`\n${lineStart}`);
             return `${assignments}\n${lineStart}window${arrayPath}`;
         });
-        return new webpack_sources_1.RawSource(updatedSource);
+        const newSource = new webpack_sources_1.RawSource(updatedSource);
+        /**
+         * Hack: depending on the loaded `webpack-sources` package, the `RawSource` class definition might contain or not
+         * the `buffer` and `isBuffer` methods. If the class does not contain them, then we polyfill them.
+         */
+        if (typeof newSource.buffer !== "function") {
+            newSource.buffer = () => Buffer.from(updatedSource, "utf-8");
+        }
+        if (typeof newSource.isBuffer !== "function") {
+            newSource.isBuffer = () => true;
+        }
+        return newSource;
     }
     processAssets(assets) {
         Object.entries(assets).forEach(([pathname, source]) => {
