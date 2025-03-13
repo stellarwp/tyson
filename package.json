@@ -1,6 +1,6 @@
 {
   "name": "@stellarwp/tyson",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Create and manage custom configurations to build projects with @wordpress/scripts.",
   "main": "dist/index.js",
   "bin": {
@@ -32,7 +32,12 @@
   },
   "homepage": "https://github.com/stellarwp/tyson",
   "dependencies": {
-    "@types/webpack": "^5.28.5"
+    "@types/webpack": "^5.28.5",
+    "postcss-custom-media": "^11.0.5",
+    "postcss-import": "^16.1.0",
+    "postcss-mixins": "^11.0.3",
+    "postcss-nested": "^7.0.2",
+    "postcss-preset-env": "^9.5.0"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
