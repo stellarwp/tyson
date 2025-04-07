@@ -377,7 +377,7 @@ cd -
 Now check the asset registrations, redirected from the `/src/resoureces` directory to the `/build` one are correct:
 
 ```bash
-php ./node_modules/@stellarwp/tyson/tools/source-updater/find-broken-assets.php "$(pwd)/src"
+php ./node_modules/@stellarwp/tyson/tools/source-updater/find-broken-assets.php "$(pwd)"
 ```
 
 The script will check if JS or CSS assets registered with any one of the following functions exist in the `/build`
