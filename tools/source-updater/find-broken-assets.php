@@ -34,7 +34,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 // Use nikic/php-parser to scan each file for calls to the `tec_asset` function and print file and line to the terminal in file:line format.
 $traverser = new NodeTraverser();
-$visitor   = new class extends NodeVisitorAbstract {
+$visitor   = new class( $directory ) extends NodeVisitorAbstract {
 	private ?SplFileInfo $currentFile = null;
 	/**
 	 * @var array<string,array{jsAssetFile: string, file: string, line: int}>
@@ -44,6 +44,17 @@ $visitor   = new class extends NodeVisitorAbstract {
 	 * @var array<string,true>
 	 */
 	private array $registeredAssets = [];
+	/**
+	 * @var string
+	 */
+	private string $directory;
+
+	/**
+	 * @param string $directory The directory being scanned.
+	 */
+	public function __construct( string $directory ) {
+		$this->directory = $directory;
+	}
 
 	public function setCurrentFile( SplFileInfo $file ) {
 		$this->currentFile = $file;
@@ -95,6 +106,11 @@ $visitor   = new class extends NodeVisitorAbstract {
 	}
 
 	private function checkAsset( string $path, int $line ): void {
+		// Ignore externals.
+		if ( str_starts_with( $path, 'http://' ) || str_starts_with( $path, 'https://' ) ) {
+			return;
+		}
+
 		if ( ! preg_match(
 			'#(?P<path>.*)(\.js|\.css)$#',
 			$path,
@@ -124,7 +140,7 @@ $visitor   = new class extends NodeVisitorAbstract {
 			];
 			$survivingCandidates         = array_filter(
 				$assetFileRealpathCandidates,
-				static fn( string $candidate ): bool => is_file( getcwd() . $candidate )
+				fn( string $candidate ): bool => is_file( $this->directory . $candidate )
 			);
 			$assetFile                   = count( $survivingCandidates ) ? reset( $survivingCandidates ) : $assetFile;
 		} else if ( str_starts_with( $match[0], 'app' ) ) {
@@ -140,14 +156,22 @@ $visitor   = new class extends NodeVisitorAbstract {
 			];
 			$survivingCandidates = array_filter(
 				$candidates,
-				static fn( string $candidate ): bool => is_file( getcwd() . $candidate )
+				fn( string $candidate ): bool => is_file( $this->directory . $candidate )
 			);
 			$assetFile           = count( $survivingCandidates ) ? reset( $survivingCandidates ) : '/build/' . $match[0];
 		} else {
-			$assetFile = "/build/{$extension}/{$match[0]}";
+			$candidates          = [
+				'/build/' . $match[0], // The app built in `/build`.
+				"/build/$extension/$match[0]" // An asset called `app-something.js`.
+			];
+			$survivingCandidates = array_filter(
+				$candidates,
+				fn( string $candidate ): bool => is_file( $this->directory . $candidate )
+			);
+			$assetFile = count( $survivingCandidates ) ? reset( $survivingCandidates ) : '/build/' . $match[0];
 		}
 
-		$assetFileRealpath = getcwd() . $assetFile;
+		$assetFileRealpath = $this->directory . $assetFile;
 
 		if ( ! is_file( $assetFileRealpath ) ) {
 			printf(
@@ -162,7 +186,7 @@ $visitor   = new class extends NodeVisitorAbstract {
 			// If the file is a .js file, check if a `style-<asset>.css` file exists: if it exists, collect it for later checking.
 			$basename = basename( $match[0] );
 			$cssFile  = str_replace( $basename, 'style-' . substr( $basename, 0, - 3 ) . '.css', $assetFile );
-			if ( is_file( getcwd() . $cssFile ) ) {
+			if ( is_file( $this->directory . $cssFile ) ) {
 				// There is a style file: make sure it's registered along with the JS asset.
 				$this->unregisteredCssAsset[ $cssFile ] = [
 					'jsAssetFile' => $assetFile,
@@ -245,6 +269,6 @@ foreach ( $visitor->getUnregisteredCssAssets() as $cssFile => $cssFileData ) {
 		$cssFileData['file'],
 		$cssFileData['line'],
 		$cssFileData['jsAssetFile'],
-		getcwd() . $cssFile
+		$directory . $cssFile
 	);
 }
