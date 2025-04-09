@@ -13,7 +13,6 @@ Tyson Migration Debugger is a utility plugin that helps identify and debug asset
 - Provides error messages through Query Monitor for missing assets
 - Throws exceptions for critical issues when Query Monitor is not available
 
-
 ## Video
 
 [Watch it here](https://www.loom.com/share/03968c5eb4944508ad59a00f5ba99653)
