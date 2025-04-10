@@ -429,6 +429,12 @@ the dependent asset as well was never used. Take some care, but you can likely r
 > directory of your local development WordPress installation and that all other plugins from the TEC suite have been
 > cloned in the same `plugins` directory, as siblings of the plugin you're working on.
 
+### Tyson Migration Debugger
+
+The [tyson-migration-debugger](../tools/migration-debug-mu-plugin/) plugin is a must-use plugin that will help you debug issues during the migration to `wp-scripts` via StellarWP's Tyson.
+
+To enable it, copy the `tyson-migration-debugger` plugin into the `mu-plugins` directory of your local development WordPress installation and activate it.
+
 ### Holistic testing
 
 Something might have escaped the automated scripts: navigate around the applicable pages and make sure all things work fine.
