@@ -67,7 +67,7 @@ facilities provided by Tyson.
 By default `@wordpress/scripts` will build [from the `/src` directory to the `/build` one][2].
 
 If a `webpack.config.js` file already exists in your project, `tyson` will **not** overwrite it and will instead print
-the contents of the file it would have written to the terminal, so that you can inspect it and decide whether or not you
+the contents of the file it would have written to the terminal, so that you can inspect it and decide whether you
 want to use it.
 
 If you want to force overwriting the existing file, you can use the `--force` option:
@@ -125,6 +125,26 @@ npm link @stellarwp/tyson
 
 Once you've done this, you will be able to run `node_modules/.bin/tyson` from the root directory of the project you're 
 using to test `tyson`.
+
+## Releasing a new version
+
+To release a new version of `tyson`, first merge your changes into the `main` branch with an approved PR passing **all** checks.  
+
+Then, run the following command to update the version in `package.json`:
+
+```bash
+npm version [patch | minor | major]
+```
+
+or:
+
+```bash
+npm version <next_version>
+```
+
+You can find more options with the `npm version` command documentation (`npm version --help`).
+
+Push the updated `package.json` file and let the automated workflow (`.github/workflows/publish.yml`) publish the new version.
 
 ## Migration
 
