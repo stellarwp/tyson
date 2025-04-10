@@ -126,6 +126,17 @@ npm link @stellarwp/tyson
 Once you've done this, you will be able to run `node_modules/.bin/tyson` from the root directory of the project you're 
 using to test `tyson`.
 
+## Releasing a new version
+
+To release a new version of `tyson`, first merge your changes into the `main` branch with an approved PR passing **all** checks.  
+
+Then, run the following command to update the version in `package.json`:
+```bash
+npm version <next_version>
+```
+
+Push the updated `package.json` file and let the automated workflow (`.github/workflows/publish.yml`) publish the new version.
+
 ## Migration
 
 Specific migration guides are available for each suite:
