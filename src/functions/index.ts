@@ -8,6 +8,7 @@ import { ruleUsesLoader } from "./ruleUsesLoader";
 import { modifyRulesInConfig } from "./modifyRulesInConfig";
 import { usesLoader } from "./usesLoader";
 import { preprocessPostcssWithPlugins } from "./preprocessPostcssWithPlugins";
+import { resolveExternalToGlobal } from "./resolveExternalToGlobal";
 
 export {
   buildExternalName,
@@ -20,4 +21,5 @@ export {
   modifyRulesInConfig,
   usesLoader,
   preprocessPostcssWithPlugins,
+  resolveExternalToGlobal,
 };

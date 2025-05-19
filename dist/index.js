@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WindowAssignPropertiesPlugin = exports.preprocessPostcssWithPlugins = exports.usesLoader = exports.modifyRulesInConfig = exports.ruleUsesLoader = exports.prependRuleToRuleInConfig = exports.isPackageRootIndex = exports.exposeEntry = exports.doNotPrefixSVGIdsClasses = exports.compileCustomEntryPoints = exports.buildExternalName = exports.createTECPackage = exports.TECPackage = exports.createTECLegacyBlocksFrontendPostCss = exports.TECLegacyBlocksFrontendPostCss = exports.createTECPostCss = exports.TECPostCss = exports.createTECLegacyJs = exports.TECLegacyJs = void 0;
+exports.WindowAssignPropertiesPlugin = exports.preprocessPostcssWithPlugins = exports.usesLoader = exports.modifyRulesInConfig = exports.ruleUsesLoader = exports.resolveExternalToGlobal = exports.prependRuleToRuleInConfig = exports.isPackageRootIndex = exports.exposeEntry = exports.doNotPrefixSVGIdsClasses = exports.compileCustomEntryPoints = exports.buildExternalName = exports.createTECPackage = exports.TECPackage = exports.createTECLegacyBlocksFrontendPostCss = exports.TECLegacyBlocksFrontendPostCss = exports.createTECPostCss = exports.TECPostCss = exports.createTECLegacyJs = exports.TECLegacyJs = void 0;
 const schema_1 = require("./schema");
 Object.defineProperty(exports, "TECLegacyBlocksFrontendPostCss", { enumerable: true, get: function () { return schema_1.TECLegacyBlocksFrontendPostCss; } });
 Object.defineProperty(exports, "createTECLegacyBlocksFrontendPostCss", { enumerable: true, get: function () { return schema_1.createTECLegacyBlocksFrontendPostCss; } });
@@ -21,5 +21,6 @@ Object.defineProperty(exports, "ruleUsesLoader", { enumerable: true, get: functi
 Object.defineProperty(exports, "modifyRulesInConfig", { enumerable: true, get: function () { return functions_1.modifyRulesInConfig; } });
 Object.defineProperty(exports, "usesLoader", { enumerable: true, get: function () { return functions_1.usesLoader; } });
 Object.defineProperty(exports, "preprocessPostcssWithPlugins", { enumerable: true, get: function () { return functions_1.preprocessPostcssWithPlugins; } });
+Object.defineProperty(exports, "resolveExternalToGlobal", { enumerable: true, get: function () { return functions_1.resolveExternalToGlobal; } });
 const webpack_1 = require("./webpack");
 Object.defineProperty(exports, "WindowAssignPropertiesPlugin", { enumerable: true, get: function () { return webpack_1.WindowAssignPropertiesPlugin; } });
