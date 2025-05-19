@@ -1,5 +1,6 @@
 import {
   addToDiscoveredPackageRoots,
+  getDiscoveredPackageRoots,
   isPackageRootIndex,
   resetDiscoveredPackageRoots,
 } from "../../src/functions/isPackageRootIndex";
@@ -34,5 +35,23 @@ describe("Package Root Index Detection", () => {
     addToDiscoveredPackageRoots("src/packageA");
     addToDiscoveredPackageRoots("src/packageB");
     expect(isPackageRootIndex("src/packageC/index.js")).toBe(true);
+  });
+
+  it("should store discovered package roots without leading or trailing slashes", () => {
+    addToDiscoveredPackageRoots("/src/packageA/");
+    addToDiscoveredPackageRoots("/src/packageB");
+    addToDiscoveredPackageRoots("src/packageC/");
+    addToDiscoveredPackageRoots("package-A");
+    addToDiscoveredPackageRoots("/package-B");
+    addToDiscoveredPackageRoots("package-C/");
+
+    expect(getDiscoveredPackageRoots()).toEqual([
+      "src/packageA",
+      "src/packageB",
+      "src/packageC",
+      "package-A",
+      "package-B",
+      "package-C",
+    ]);
   });
 });

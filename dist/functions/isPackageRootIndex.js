@@ -48,7 +48,9 @@ function resetDiscoveredPackageRoots() {
  * @param {string} packageRoot The package root to add.
  */
 function addToDiscoveredPackageRoots(packageRoot) {
-    discoveredPackageRoots.push(packageRoot);
+    // Remove any leading and trailing slashes from the package root.
+    const cleanRoot = packageRoot.replace(/^\/+|\/+$/g, "");
+    discoveredPackageRoots.push(cleanRoot);
 }
 /**
  * Returns the package roots discovered so far.
