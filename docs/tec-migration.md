@@ -377,7 +377,7 @@ cd -
 Now check the asset registrations, redirected from the `/src/resoureces` directory to the `/build` one are correct:
 
 ```bash
-php ./node_modules/@stellarwp/tyson/tools/source-updater/find-broken-assets.php "$(pwd)/src"
+php ./node_modules/@stellarwp/tyson/tools/source-updater/find-broken-assets.php "$(pwd)"
 ```
 
 The script will check if JS or CSS assets registered with any one of the following functions exist in the `/build`
@@ -428,6 +428,12 @@ the dependent asset as well was never used. Take some care, but you can likely r
 > Note: the above command assumes you're running this from the root directory of a plugin placed in the `plugins`
 > directory of your local development WordPress installation and that all other plugins from the TEC suite have been
 > cloned in the same `plugins` directory, as siblings of the plugin you're working on.
+
+### Tyson Migration Debugger
+
+The [tyson-migration-debugger](../tools/migration-debug-mu-plugin/) plugin is a must-use plugin that will help you debug issues during the migration to `wp-scripts` via StellarWP's Tyson.
+
+To enable it, copy the `tyson-migration-debugger` plugin into the `mu-plugins` directory of your local development WordPress installation and activate it.
 
 ### Holistic testing
 

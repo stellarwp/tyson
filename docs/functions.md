@@ -88,3 +88,71 @@ This function is particularly useful when:
 2. Keep namespace segments short and meaningful
 3. Use the `dropFrags` parameter to remove common prefixes or suffixes that don't add value to the final name
 4. Maintain consistency in namespace naming across your project 
+
+## resolveExternalToGlobal
+
+The `resolveExternalToGlobal` function is used in Webpack configurations to map package requests to global variable names. It converts namespace paths into a format suitable for external module resolution.
+
+### Syntax
+
+```typescript
+resolveExternalToGlobal(packagePrefix: string, packageWindowObjectName: string): (request: string) => string
+```
+
+### Parameters
+
+- `packagePrefix`: The namespace prefix to match against import requests (e.g., `'@tec/plugin/package'`).
+- `packageWindowObjectName`: The global object name to map to (e.g., `'window.tec.plugin.package'`).
+
+### Examples
+
+#### Basic Usage in Webpack Config
+
+```typescript
+module.exports = {
+  externals: [
+    resolveExternalToGlobal('@tec/plugin/package', 'window.tec.plugin.package'),
+    resolveExternalToGlobal('@tec/another-plugin', 'window.tec.anotherPlugin')
+  ]
+};
+```
+
+#### Request Resolution
+
+For a request like `'@tec/plugin/package/feature'`:
+- Matches `packagePrefix`
+- Becomes `window.tec.plugin.package.feature`
+
+### Use Cases
+
+1. Mapping internal package imports to global variables in Webpack
+2. Simplifying external module resolution for nested namespaces
+3. Consistent naming when exposing modules globally
+
+### Examples
+
+In the Webpack configuration, you can use this function to map specific packages to their respective global variables:
+
+```
+module.exports = {
+  ...defaultConfig,
+  ...{
+    externals:[
+        ...(defaultConfig?.externals || []),
+        resolveExternalToGlobal('@tec/plugin', 'window.tec.plugin'),
+    ],
+  },
+};
+```
+
+In the code reference the `@tec/plugin` namespace:
+
+```js
+import {functionOne} from "@tec/plugin/package";
+import {functionTwo} from "@tec/plugin/package/functions";
+```
+
+### Best Practices
+
+1. Use exact namespace prefixes to avoid unintended matches
+2. Ensure `packageWindowObjectName` matches your global variable structure

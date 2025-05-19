@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.preprocessPostcssWithPlugins = exports.usesLoader = exports.modifyRulesInConfig = exports.ruleUsesLoader = exports.prependRuleToRuleInConfig = exports.isPackageRootIndex = exports.exposeEntry = exports.doNotPrefixSVGIdsClasses = exports.compileCustomEntryPoints = exports.buildExternalName = void 0;
+exports.resolveExternalToGlobal = exports.preprocessPostcssWithPlugins = exports.usesLoader = exports.modifyRulesInConfig = exports.ruleUsesLoader = exports.prependRuleToRuleInConfig = exports.isPackageRootIndex = exports.exposeEntry = exports.doNotPrefixSVGIdsClasses = exports.compileCustomEntryPoints = exports.buildExternalName = void 0;
 const buildExternalName_1 = require("./buildExternalName");
 Object.defineProperty(exports, "buildExternalName", { enumerable: true, get: function () { return buildExternalName_1.buildExternalName; } });
 const compileCustomEntryPoints_1 = require("./compileCustomEntryPoints");
@@ -21,3 +21,5 @@ const usesLoader_1 = require("./usesLoader");
 Object.defineProperty(exports, "usesLoader", { enumerable: true, get: function () { return usesLoader_1.usesLoader; } });
 const preprocessPostcssWithPlugins_1 = require("./preprocessPostcssWithPlugins");
 Object.defineProperty(exports, "preprocessPostcssWithPlugins", { enumerable: true, get: function () { return preprocessPostcssWithPlugins_1.preprocessPostcssWithPlugins; } });
+const resolveExternalToGlobal_1 = require("./resolveExternalToGlobal");
+Object.defineProperty(exports, "resolveExternalToGlobal", { enumerable: true, get: function () { return resolveExternalToGlobal_1.resolveExternalToGlobal; } });

@@ -19,6 +19,7 @@ import {
   modifyRulesInConfig,
   usesLoader,
   preprocessPostcssWithPlugins,
+  resolveExternalToGlobal,
 } from "./functions";
 import { WindowAssignPropertiesPlugin } from "./webpack";
 
@@ -38,6 +39,7 @@ export {
   exposeEntry,
   isPackageRootIndex,
   prependRuleToRuleInConfig,
+  resolveExternalToGlobal,
   ruleUsesLoader,
   modifyRulesInConfig,
   usesLoader,
