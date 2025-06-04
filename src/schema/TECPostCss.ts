@@ -44,14 +44,16 @@ export function createTECPostCss(
    */
   function modifyConfig(config: WebPackConfiguration): void {
     preprocessPostcssWithPlugins(
-      config, 
+      config,
       [
         "postcss-nested",
         "postcss-preset-env",
         "postcss-mixins",
         "postcss-import",
         "postcss-custom-media",
-      ].concat( preprocessPlugins ).filter((e, i,self ) => i === self.indexOf(e))
+      ]
+        .concat(preprocessPlugins)
+        .filter((e, i, self) => i === self.indexOf(e)),
     );
   }
 
