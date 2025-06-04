@@ -11,6 +11,7 @@ import { preprocessPostcssWithPlugins } from "../functions";
  */
 export function createTECPostCss(
   namespace: string | string[] = "tec",
+  preprocessPlugins: string | string[] = [],
 ): ConfigurationSchema {
   /**
    * Determines if a file should be included based on its name.
@@ -37,16 +38,23 @@ export function createTECPostCss(
    * PostCSS plugins to unroll the code. These plugins, applied before the `autoprefixer` one, will make the PostCSS code
    * digestable for the `autoprefixer` plugin and the following ones.
    *
+   * Additional plugins can be passed to the createTECPostCss function as the second param `preprocessPlugins`
+   *
    * @param {WebPackConfiguration} config - The WebPack configuration object to be modified.
    */
   function modifyConfig(config: WebPackConfiguration): void {
-    preprocessPostcssWithPlugins(config, [
-      "postcss-nested",
-      "postcss-preset-env",
-      "postcss-mixins",
-      "postcss-import",
-      "postcss-custom-media",
-    ]);
+    preprocessPostcssWithPlugins(
+      config,
+      [
+        "postcss-nested",
+        "postcss-preset-env",
+        "postcss-mixins",
+        "postcss-import",
+        "postcss-custom-media",
+      ]
+        .concat(preprocessPlugins)
+        .filter((e, i, self) => i === self.indexOf(e)),
+    );
   }
 
   return {
