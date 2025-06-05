@@ -9,7 +9,7 @@ const functions_1 = require("../functions");
  * @param {string|string[]} [namespace="tec"] - The namespace to use for the schema.
  * @returns {ConfigurationSchema} The configured schema.
  */
-function createTECPostCss(namespace = 'tec', preprocessPlugins = []) {
+function createTECPostCss(namespace = "tec", preprocessPlugins = []) {
     /**
      * Determines if a file should be included based on its name.
      * @param {FileCallbackArguments} args - The arguments containing the file name.
