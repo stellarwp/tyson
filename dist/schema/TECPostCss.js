@@ -9,7 +9,7 @@ const functions_1 = require("../functions");
  * @param {string|string[]} [namespace="tec"] - The namespace to use for the schema.
  * @returns {ConfigurationSchema} The configured schema.
  */
-function createTECPostCss(namespace = "tec") {
+function createTECPostCss(namespace = 'tec', preprocessPlugins = []) {
     /**
      * Determines if a file should be included based on its name.
      * @param {FileCallbackArguments} args - The arguments containing the file name.
@@ -33,6 +33,8 @@ function createTECPostCss(namespace = "tec") {
      * PostCSS plugins to unroll the code. These plugins, applied before the `autoprefixer` one, will make the PostCSS code
      * digestable for the `autoprefixer` plugin and the following ones.
      *
+     * Additional plugins can be passed to the createTECPostCss function as the second param `preprocessPlugins`
+     *
      * @param {WebPackConfiguration} config - The WebPack configuration object to be modified.
      */
     function modifyConfig(config) {
@@ -42,7 +44,9 @@ function createTECPostCss(namespace = "tec") {
             "postcss-mixins",
             "postcss-import",
             "postcss-custom-media",
-        ]);
+        ]
+            .concat(preprocessPlugins)
+            .filter((e, i, self) => i === self.indexOf(e)));
     }
     return {
         fileExtensions: [".pcss"],
