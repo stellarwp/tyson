@@ -53,6 +53,14 @@ $visitor   = new class( $directory ) extends NodeVisitorAbstract {
 	 * @param string $directory The directory being scanned.
 	 */
 	public function __construct( string $directory ) {
+		if ( str_ends_with( $directory, '/src' ) ) {
+			$directory = str_replace( '/src', '', $directory );
+		}
+		
+		if ( str_ends_with( $directory, '/src/' ) ) {
+			$directory = str_replace( '/src/', '', $directory );
+		}
+
 		$this->directory = $directory;
 	}
 
@@ -85,7 +93,12 @@ $visitor   = new class( $directory ) extends NodeVisitorAbstract {
 		}
 
 		if ( $node instanceof Node\Expr\StaticCall ) {
-			$className  = $node->class->name;
+			$className = $node->class->name;
+			
+			if ( ! is_callable( [ $node->name, 'toString' ] ) ) {
+				return $node;
+			}
+
 			$methodName = $node->name->toString();
 
 			if (
@@ -98,14 +111,14 @@ $visitor   = new class( $directory ) extends NodeVisitorAbstract {
 				], true )
 			) {
 				$path = $node->args[1]->value->value;
-				$this->checkAsset( $path, $node->getLine() );
+				$this->checkAsset( $path, $node->getLine(), true );
 			}
 
 			return $node;
 		}
 	}
 
-	private function checkAsset( string $path, int $line ): void {
+	private function checkAsset( string $path, int $line, bool $isModern = false ): void {
 		// Ignore externals.
 		if ( str_starts_with( $path, 'http://' ) || str_starts_with( $path, 'https://' ) ) {
 			return;
@@ -174,12 +187,33 @@ $visitor   = new class( $directory ) extends NodeVisitorAbstract {
 		$assetFileRealpath = $this->directory . $assetFile;
 
 		if ( ! is_file( $assetFileRealpath ) ) {
-			printf(
-				"Error at %s:%d\n└── Asset %s doesn't exist.\n",
-				$this->currentFile->getRealPath(),
-				$line,
-				'.' . $assetFile
-			);
+
+			$modernFound = false;
+
+			if ( $isModern ) {
+				$assetGlobSearch = $this->directory . '/build/{,*/,*/*/,*/*/*/,*/*/*/*/,*/*/*/*/*/}' . $match['0'];
+				$glob = glob( $assetGlobSearch, GLOB_BRACE | GLOB_MARK );
+
+				if ( ! empty( $glob['0'] ) && is_file( $glob['0'] ) ) {
+					$modernFound = true;
+					printf(
+						"Warning at %s:%d\n└── Found %s through glob.\n",
+						$this->currentFile->getRealPath(),
+						$line,
+						'.' . $glob['0']
+					);
+				}
+
+			}
+
+			if ( ! $modernFound ) {
+				printf(
+					"Error at %s:%d\n└── Asset %s doesn't exist.\n",
+					$this->currentFile->getRealPath(),
+					$line,
+					'.' . $assetFile
+				);
+			}
 		}
 
 		if ( $extension === 'js' ) {
