@@ -94,6 +94,7 @@ $visitor   = new class( $directory ) extends NodeVisitorAbstract {
 
 		if ( $node instanceof Node\Expr\StaticCall ) {
 			$className = $node->class->name;
+			
 			if ( ! is_callable( [ $node->name, 'toString' ] ) ) {
 				return $node;
 			}
@@ -190,7 +191,7 @@ $visitor   = new class( $directory ) extends NodeVisitorAbstract {
 			$modernFound = false;
 
 			if ( $isModern ) {
-				$assetGlobSearch = $this->directory . '/build/{,*/,*/*/,*/*/*/}' . $match['0'];
+				$assetGlobSearch = $this->directory . '/build/{,*/,*/*/,*/*/*/,*/*/*/*/,*/*/*/*/*/}' . $match['0'];
 				$glob = glob( $assetGlobSearch, GLOB_BRACE | GLOB_MARK );
 
 				if ( ! empty( $glob['0'] ) && is_file( $glob['0'] ) ) {
